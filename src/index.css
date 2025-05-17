@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+
+@font-face {
+    font-family: poppins;
+    src: url('./assets/Poppins/Poppins-Regular.ttf');
+}
+@font-face {
+    font-family: poppins-italic;
+    src: url('./assets/Poppins/Poppins-Italic.ttf');
+}
+@font-face {
+    font-family: poppins-medium;
+    src: url('./assets/Poppins/Poppins-Medium.ttf');
+}
+@font-face {
+    font-family: poppins-semibold;
+    src: url('./assets/Poppins/poppins-Bold.ttf');
+}
+@font-face {
+    font-family: poppins-bold;
+    src: url('./assets/Poppins/Poppins-ExtraBold.ttf');
+}
+
+.InputAni {
+    animation-name: searchInput;
+    animation-duration: 0.1s;
+    width: 10%;
+    animation-fill-mode: forwards;
+    text-align: left;
+}
+
+@keyframes searchInput {
+    from {
+        width: 10%;
+    }
+    to {
+        width: 96%;
+    }
+}
+
+.InputAni2 {
+    animation-name: searchInput2;
+    animation-duration: 0.1s;
+    width: 10%;
+    animation-fill-mode: forwards;
+    text-align: left;
+}
+
+@keyframes searchInput2 {
+    from {
+        width: 10%;
+    }
+    to {
+        width: 200px;
+    }
+}
