@@ -1,4 +1,4 @@
-import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share } from "lucide-react";
+import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowUpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import sayso from '../../assets/sayso assets/sayso.svg'
 import clsx from 'clsx'
@@ -8,17 +8,66 @@ import AuthForm from "../components/authform";
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import { useState, useRef } from 'react'
 import { Toaster } from 'sonner'
+import imageOne from '../../assets/logo2.jpg'
+import './home.css'
+import InfoDisplay from "../components/trigger";
 
-const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment }) => {
+function FullPageInfo() {
+    const isMobile = useMediaQuery('(max-width: 700px)');
+    return (
+        <div className={clsx('flex', 'p-4', 'gap-2', 'text-white', isMobile ? 'flex-col' : '')}>
+            <Post username={'amaka'} profilepic='' readtime='12 min' date='nn' title='bubububu' tags={['hey', 'hi']} postImg='' likes={12} comment='2' review={true} />
+
+            <div className='rounded-xl w-92 overflow-scroll h-128 border border-[#272b34] p-2 -pt-1 flex flex-col gap-2 handleScroll'>
+                <p className='font-[poppins-medium]'>Comments</p>
+
+                <div className='flex flex-col gap-2 font-[poppins] text-[12px]'>
+                    <div className='border border-[#272b34] rounded-lg p-2 flex gap-2 items-start'>
+                        <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34]'></span>
+                        <p className='leading-snug'>
+                            <span className='font-[poppins-medium] w-full'>username</span><br />
+                            <span>Lorem ipsum dolor sit amet consectetur repellat autem!</span> <br />
+                            <span className='flex items-center text-[#ffffff90] gap-4 mt-1.5 cursor-pointer'><Pencil className='size-3.5' /> <Trash className='size-3.5' /></span>
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    );
+
+}
+
+function More() {
+    return (
+        <div className='flex flex-col items-center gap-4 font-[poppins-medium] p-6'>
+            <p className='text-white font-[poppins-bold]'>What do you Wanna do?</p>
+            <div className='flex gap-2 text-md text-white'>
+                <Button className='flex gap-1 items-center bg-[#272b34]'><Pencil className='size-4' /> <p>Edit Post</p></Button>
+                <Button className='flex gap-1 items-center bg-[#272b34]'><Trash className='text-red-500 size-4' /> <p>Delete Post</p></Button>
+            </div></div>
+    );
+
+}
+
+const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review }) => {
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [liked, setLiked] = useState(false)
     const [dislike, setDisLiked] = useState(false)
-    const [msgOpen, setMsgOpen] = useState(false)                                                       
-    
+    const [msgOpen, setMsgOpen] = useState(false)
+
+
+
 
     return (
 
-        <div className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', isMobile ? 'w-full' : 'w-78')} style={{}}>
+        <div onMouseMove={(e) => {
+            const mouseX = e.clientX
+            const mouseY = e.clientY
+
+        }} className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
                     <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
@@ -28,11 +77,15 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                     </div>
                 </div>
                 <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
-                    <MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />
+                    <InfoDisplay
+                        info={More}
+                        trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
+                    />
                 </div>
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
-                <h2 className="font-[poppins-semibold] text-lg leading-snug h-15 text-white">{title}</h2>
+                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white">{title}</h2>
+                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{title}</h2> : ''}
                 <div className='flex items-center gap-2'>
                     {tags.map(tags =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tags}</p>
@@ -43,39 +96,54 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                 </div>
             </div>
             <div className='p-2 pt-0 pb-0'>
-                <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', 'bg-[#272b34]')}>
-                    <img src={postImg} className='object-fit w-full h-auto' />
+                <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden')}>
+                    <img src={imageOne} className='object-fit w-full h-auto' />
                 </div>
             </div>
             <div className='px-2 select-none'>
-                <div className='w-full b-0 h-full flex items-center gap-4'>
+                <div className='w-full b-0 h-full flex relative items-center gap-4'>
                     <div className='bg-[#272b34] rounded-xl flex gap-1 items-center cursor-pointer'>
 
-                        <span className='flex gap-2 p-2 py-1.5 items-start rounded-xl hover:bg-[#3B82F650] active:bg-[#3B82F650] transition' onClick={() => {setDisLiked(false); setLiked(!liked);  }}>
-                            {liked && !dislike ?  <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-blue-500 stroke-[#3B82F6]' onClick={() => setLiked(false)}><path d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"></path></svg> 
-                            : <ThumbsUp onClick={() => {
-                                setDisLiked(false)
-                                setLiked(true)
-                            }} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent '/>
-                            
-                         }<p className='text-[#bbbbcc] font-[poppins-semibold] text-[15px]' style={{color: liked && !dislike ? '#3B82F6':'#bbbbcc'}}>{likes}</p>
+                        <span className='flex gap-2 p-2 py-1.5 items-start rounded-xl hover:bg-[#3B82F650] active:bg-[#3B82F650] transition' onClick={() => { setDisLiked(false); setLiked(!liked); }}>
+                            {liked && !dislike ? <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-blue-500 stroke-[#3B82F6]' onClick={() => setLiked(false)}><path d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"></path></svg>
+                                : <ThumbsUp onClick={() => {
+                                    setDisLiked(false)
+                                    setLiked(true)
+                                }} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent ' />
+
+                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{likes}</p>
                         </span>
                         <span className='p-2 py-1.5 rounded-xl hover:bg-[#EF444450] active:bg-[#EF444450] transition'>
-                            {!dislike ? <ThumbsDown onClick={() => setDisLiked(true)} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent'/>
-                            : <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-red-500 stroke-[#EF4444]' onClick={() => setDisLiked(false)}><path d="M19 15h4V3h-4m-4 0H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2a2 2 0 0 0 2 2h6.31l-.95 4.57c-.02.1-.03.2-.03.31c0 .42.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5a2 2 0 0 0-2-2"></path></svg> 
+                            {!dislike ? <ThumbsDown onClick={() => setDisLiked(true)} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent' />
+                                : <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-red-500 stroke-[#EF4444]' onClick={() => setDisLiked(false)}><path d="M19 15h4V3h-4m-4 0H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2a2 2 0 0 0 2 2h6.31l-.95 4.57c-.02.1-.03.2-.03.31c0 .42.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5a2 2 0 0 0-2-2"></path></svg>
                             }
                         </span>
                     </div>
-                    <div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
-                        <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />
-                        <p className='text-[#bbbbcc] font-[poppins-semibold] text-[15px]'>{comment}</p>
-                     
-                    </div>
+                    {review ? <div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
+                        <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />   <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment}</p>
+                    </div> :
+                        <InfoDisplay
+                            info={FullPageInfo}
+                            trigger={<div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
+                                <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />   <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment}</p>
+                            </div>}
+                        />
+                    }
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl'>
                         <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' />
                     </div>
-
+                    <p className='bg-white rounded-lg p-1.5 py-1 absolute right-0 text-black text-[13px] items-center gap-1 font-[poppins-medium] readMore'> Read
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                    </p>
                 </div>
+                {review ?
+                    <div className='-mt-2 flex items-center gap-1'> <input
+                        className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
+                        placeholder='Comment'
+                    /> <ArrowUpCircle className='bg-[#272b34] p-1 rounded-xl size-11 px-2' /> </div> : ''
+                }
             </div>
         </div>
     )
@@ -320,9 +388,14 @@ const Home = () => {
     ]
 
 
+    const [filterOpen, setFilterOpen] = useState(false);
+    const filter = () => {
+        setFilterOpen(!filterOpen)
+    }
+
     return (
         <div>
-            <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116]'>
+            <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000'>
                 <h1 className='font-[poppins-bold] text-xl select-none'><img src={sayso} alt='saysologo' className='w-24' /></h1>
                 <div className='flex gap-2 items-center'>
                     {
@@ -332,7 +405,7 @@ const Home = () => {
                                 onBlur={() => setIsFocused(false)}
                                 type='search'
                                 placeholder='Search Posts...'
-                                className='absolute text-xs bg-[#262a35] rounded-xl p-4 pl-4 outline-0 InputAni min-lg:InputAni2 right-2' />
+                                className='absolute text-xs bg-[#262a35] rounded-xl p-4 pl-4 outline-0 InputAni min-lg:InputAni2 right-2 max-w-xl' />
                         )
                     }
 
@@ -349,7 +422,7 @@ const Home = () => {
             </div>
 
             <div className='w-full h-[90vh] bg-gradient-to-r from-blue-500 to-pink-500 flex items-center flex-col gap-4 justify-center'>
-                <p className='text-xl font-[poppins-bold] text-center leading-snug'>Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
+                <p className='text-xl font-[poppins-bold] text-center leading-snug'><br /> Say More With Sayso</p>
                 <Button className='bg-[#272b34]' onClick={() => setAuthActive(true)}>Get Started</Button>
             </div>
 
@@ -359,11 +432,16 @@ const Home = () => {
                 <div className='flex flex-col p-2 gap-4 max-w-6xl'>
                     <div className='flex items-center justify-center gap-4 mt-6 mb-2'>
                         <Button className='bg-blue-500 font-[poppins-medium]'>All Posts</Button>
-                        <Button className='bg-[#1c1f26] font-[poppins-medium]'>Filter <Filter /> </Button>
+                        <Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>
+                        <div className='flex gap-2 items-center overflow-hidden w-0 border-b-l' style={{ width: filterOpen ? '130px' : '0px', transition: '.3s' }}>
+                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[12px]'>Category</span>
+                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[12px]'>Tags</span>
+                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[12px]'>Keyword</span>
+                        </div>
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data.map(element =>
-                            <Post username={element.username} profilepic={element.profilePicture} readtime={element.readTime} date={element.date} title={element.postTitle} tags={element.tags} postImg={element.postImage} likes={element.likes} comment={element.comments} />
+                            <Post username={element.username} profilepic={element.profilePicture} readtime={element.readTime} date={element.date} title={element.postTitle} tags={element.tags} postImg={element.postImage} likes={element.likes} comment={element.comments} review={false} />
                         )
                         }
                     </div>
@@ -405,14 +483,14 @@ const Home = () => {
                     },
                 }}
             >
-                <div className="p-1.5 px-3 h-[90vh] max-wd-lg text-white bg-[#1a1b20] flex flex-col gap-4 items-center">
+                <div className="p-1.5 px-3ccccccccccccccccccccxxzzxzxcccccccccccxxxzz h-[90vh] max-wd-lg text-white bg-[#1a1b20] flex flex-col gap-4 items-center">
                     <div className='bg-[#444455] w-12 h-1.5 rounded-full'></div>
-                    <X className='absolute top-4 right-4 cursor-pointer' onClick={() => setAuthActive(false)} />
+                    <X className='absolute right-4 top-4 cursor-pointer' onClick={() => setAuthActive(false)} />
                     {/* <div className='w-full flex gap-2 items-center'> */}
                     <AuthForm />
                 </div>
             </SwipeableDrawer>
-            
+
             <Toaster position="top-center" closeButton />
         </div>
     );

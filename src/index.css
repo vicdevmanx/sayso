@@ -21,6 +21,26 @@
     src: url('./assets/Poppins/Poppins-ExtraBold.ttf');
 }
 
+button {
+    cursor:pointer;
+    user-select: none;
+}
+
+
+.handleScroll::-webkit-scrollbar {
+    scrollbar-width: thin;
+    }
+
+.handleScroll::-webkit-scrollbar-track {
+background: transparent;
+}
+
+.handleScroll::-webkit-scrollbar-thumb {
+    background-color: #272b34;
+    width: 8px;
+    border-radius: 16px;
+}
+
 .InputAni {
     animation-name: searchInput;
     animation-duration: 0.1s;

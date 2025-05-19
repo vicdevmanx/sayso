@@ -1,0 +1,8 @@
+
+.readMore {
+    display: none;
+}
+
+.parent:hover .readMore {
+    display: flex;
+}

@@ -21,12 +21,12 @@ export const routes = createBrowserRouter([
             {
                 path: "/profile",
                 element:<Profile />,
+            },
+            {
+                path: "/post/:id",
+                element:<Fullblog />,
             }
         ]
-    },
-    {
-        path: "/post/:id",
-        element:<Fullblog />,
     }
 
 ])
