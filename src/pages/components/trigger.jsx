@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal, Box } from "@mui/material";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { X } from "lucide-react";
 
 export default function InfoDisplay({ info: InfoComponent, trigger }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -29,8 +30,9 @@ export default function InfoDisplay({ info: InfoComponent, trigger }) {
           <DrawerTrigger asChild>
             <span className="hidden" />
           </DrawerTrigger>
-          <DrawerContent className=" border-0 bg-[#1c1f26]">
-            <div className="p-2">
+          <DrawerContent className=" border-0 px-2 bg-[#1c1f26]">
+          <div className="text-white flex flex-col items-center ">
+              <div className='bg-[#444455] w-12 h-1 rounded-full mb-2 -mt-2'></div>
               <InfoComponent />
             </div>
           </DrawerContent>

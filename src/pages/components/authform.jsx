@@ -31,13 +31,14 @@ const Signup = ({ func }) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
-            [name]: value.trim()
+            [name]: value
         })
 
     }
 
     const profileImgRef = useRef(null);
     const [profileImg, setProfileImg] = useState(null);
+    const [mainPicFile, setMainPicFile] = useState('');
 
     const handleFileUpload = () => {
         profileImgRef.current?.click();
@@ -46,6 +47,7 @@ const Signup = ({ func }) => {
 
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
+        setMainPicFile(file)
 
         if (file) {
             const reader = new FileReader();
@@ -60,6 +62,20 @@ const Signup = ({ func }) => {
 
     const handleSignup = async () => {
 
+        var formdata = new FormData();
+        formdata.append("email", formData.email);
+        formdata.append("password", formData.password);
+        formdata.append("fullname", "anonymous");
+        formdata.append("username", formData.username);
+        formdata.append("bio", formData.bio);
+        formdata.append("profilePic", mainPicFile, "file");
+
+        var requestOptions = {
+            method: 'POST',
+            body: formdata,
+            redirect: 'follow'
+        };
+
         try {
 
             if (!formData.username || !formData.email || !formData.password || !formData.bio) {
@@ -71,34 +87,31 @@ const Signup = ({ func }) => {
                 return
             }
             setLoading(true);
-            // const response = await fetch(`https://sayso-amber.vercel.app/api/auth/register`, {
-            //     method: 'POST',
-            //     headers: { 'content-Type': 'application/json' },
-            //     body: JSON.stringify({ username: formData.username, email: formData.email, password: formData.password, bio: formData.bio})
-            // });
-            // const result = await response.json()
-            // if (result.success) {
-            //     setLoading(false);
-            //     toast.success(result.message);
-            //     // localStorage.setItem('user', result)
-            //     console.log(result);
-            //     navigate('/')
-            // } else {
-            //     setLoading(false);
-            //     toast.error(`${result.message} try again!`);
-            // }
+            
+
+            const response = await fetch("https://sayso-seven.vercel.app/api/register", requestOptions)
+            
+            
+                const result = await response.json()
+                setLoading(false);
+                toast.success(result.message);
+                // localStorage.setItem('user', result)
+                console.log(result);
+                navigate('/')
+           
 
         }
         catch (err) {
             console.log(err)
-            toast.error(err);
+            setLoading(false);
+            toast.error('error');
         }
     }
 
     return (
         <div>
             <div className="flex flex-col gap-2 p-2 text-center">
-                <h1 className="text-2xl font-[poppins-semibold] text-white">Create an account</h1>
+                <h1 className="text-2xl font-[poppins-bold] text-white">Create an account</h1>
                 <p className="text-sm text-[#717889]">Join the community and start sharing your thoughts.</p>
             </div>
             <div className="min-[350px]:w-82 w-72 flex justify-center relative">
@@ -170,8 +183,6 @@ const Signup = ({ func }) => {
                     value={formData.bio}
                     onChange={handleChange}
                     onInput={(e) => {
-                        e.target.value = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
-
                         if (e.target.value.length < 5) {
                             setErr({ ...err, bio: 'bio must be at least 5 characters' });
                         } else if (e.target.value.length > 150) {

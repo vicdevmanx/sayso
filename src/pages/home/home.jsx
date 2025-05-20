@@ -5,34 +5,52 @@ import clsx from 'clsx'
 import { useMediaQuery } from "@mui/material";
 import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import Drawer from '@mui/material/Drawer';
 import { useState, useRef } from 'react'
 import { Toaster } from 'sonner'
 import imageOne from '../../assets/logo2.jpg'
 import './home.css'
 import InfoDisplay from "../components/trigger";
+import { useNavigate } from 'react-router-dom'
 
 function FullPageInfo() {
     const isMobile = useMediaQuery('(max-width: 700px)');
+    const navigate = useNavigate()
     return (
-        <div className={clsx('flex', 'p-4', 'gap-2', 'text-white', isMobile ? 'flex-col' : '')}>
-            <Post username={'amaka'} profilepic='' readtime='12 min' date='nn' title='bubububu' tags={['hey', 'hi']} postImg='' likes={12} comment='2' review={true} />
+        <div className={clsx('flex', isMobile ? 'p-0' : 'p-4', 'gap-2', 'text-white')}>
+            {isMobile ? <></> :
+                <Post username={'amaka'} profilepic='' readtime='12 min' date='nn' title='bubububu' tags={['hey', 'hi']} postImg='' likes={12} comment='2' review={true} />
+            }
 
-            <div className='rounded-xl w-92 overflow-scroll h-128 border border-[#272b34] p-2 -pt-1 flex flex-col gap-2 handleScroll'>
-                <p className='font-[poppins-medium]'>Comments</p>
+            <div className='flex flex-col gap-2'>
+                <p className='font-[poppins-bold] text-lg' style={{textAlign: isMobile ? 'center' : 'left'}}>Comments</p>
+                { isMobile ?
+                    <div className=' flex items-center gap-1'> <input
+                        className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
+                        placeholder='Comment'
+                    /> <ArrowUpCircle className='bg-[#272b34] p-2 rounded-xl size-11 w-16 px-2' /> </div>
+                    : <></>
+                }
+                <div className={clsx('rounded-xl', isMobile ? 'w-full':'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
+                  
 
-                <div className='flex flex-col gap-2 font-[poppins] text-[12px]'>
-                    <div className='border border-[#272b34] rounded-lg p-2 flex gap-2 items-start'>
-                        <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34]'></span>
-                        <p className='leading-snug'>
-                            <span className='font-[poppins-medium] w-full'>username</span><br />
-                            <span>Lorem ipsum dolor sit amet consectetur repellat autem!</span> <br />
-                            <span className='flex items-center text-[#ffffff90] gap-4 mt-1.5 cursor-pointer'><Pencil className='size-3.5' /> <Trash className='size-3.5' /></span>
-                        </p>
+                    <div className='flex flex-col gap-2 font-[poppins] text-[13px]'>
+                        <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 items-start'>
+                            <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34]'></span>
+                            <p className='leading-snug'>
+                                <span className='font-[poppins-medium] w-full text-sm'>username</span><br />
+                                <span>Lorem ipsum dolor sit amet consectetur repellat autem!</span> <br />
+                                <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
+                                    <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' /> 
+                                    <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full'/></span>
+                            </p>
 
+                        </div>
                     </div>
-                </div>
 
+
+                </div>
+                
             </div>
 
         </div>
@@ -40,7 +58,7 @@ function FullPageInfo() {
 
 }
 
-function More() {
+export function More() {
     return (
         <div className='flex flex-col items-center gap-4 font-[poppins-medium] p-6'>
             <p className='text-white font-[poppins-bold]'>What do you Wanna do?</p>
@@ -139,10 +157,10 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                     </p>
                 </div>
                 {review ?
-                    <div className='-mt-2 flex items-center gap-1'> <input
+                    <div className='mt-2 flex items-center gap-1'> <input
                         className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
                         placeholder='Comment'
-                    /> <ArrowUpCircle className='bg-[#272b34] p-1 rounded-xl size-11 px-2' /> </div> : ''
+                    /><ArrowUpCircle className='bg-[#272b34] p-2 rounded-xl size-11 w-16 px-2' /></div> : ''
                 }
             </div>
         </div>
@@ -469,7 +487,7 @@ const Home = () => {
                 </div>
             </footer>
 
-            <SwipeableDrawer
+            <Drawer
                 anchor="bottom"
                 open={AuthActive}
                 onClose={() => setAuthActive(false)}
@@ -483,13 +501,12 @@ const Home = () => {
                     },
                 }}
             >
-                <div className="p-1.5 px-3ccccccccccccccccccccxxzzxzxcccccccccccxxxzz h-[90vh] max-wd-lg text-white bg-[#1a1b20] flex flex-col gap-4 items-center">
-                    <div className='bg-[#444455] w-12 h-1.5 rounded-full'></div>
+                <div className="p-1.5 px-3 h-[90vh] max-wd-lg text-white bg-[#1a1b20] flex flex-col gap-4 items-center">
                     <X className='absolute right-4 top-4 cursor-pointer' onClick={() => setAuthActive(false)} />
                     {/* <div className='w-full flex gap-2 items-center'> */}
                     <AuthForm />
                 </div>
-            </SwipeableDrawer>
+            </Drawer>
 
             <Toaster position="top-center" closeButton />
         </div>
