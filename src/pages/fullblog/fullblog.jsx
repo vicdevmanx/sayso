@@ -23,7 +23,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                 redirect: 'follow'
             };
 
-            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
+            const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
             const result = await response.json();
             console.log(result)
             setData(result)
