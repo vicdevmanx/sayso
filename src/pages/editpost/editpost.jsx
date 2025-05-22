@@ -1,5 +1,6 @@
 import CreatePost from "../createPost/createPost";
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const EditPost = () => {
 const { id } = useParams();
