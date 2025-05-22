@@ -6,7 +6,7 @@ import { useMediaQuery } from "@mui/material";
 import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
 import Drawer from '@mui/material/Drawer';
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Toaster } from 'sonner'
 import imageOne from '../../assets/logo2.jpg'
 import './home.css'
