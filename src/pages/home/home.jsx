@@ -21,7 +21,7 @@ function FullPageInfo() {
     return (
         <div className={clsx('flex', isMobile ? 'p-0' : 'p-4', 'gap-2', 'text-white')}>
             {isMobile ? <></> :
-                <Post username={'amaka'} profilepic='' readtime='12 min' date='nn' title='bubububu' tags={['hey', 'hi']} postImg='' likes={12} comment='2' review={true} />
+                <Post username={'amaka'} profilepic='' readtime='12 min' date='nn' title='bubububu' tags={['hey', 'hi']} postImg='' likes={12} comment='2' review={true} id={1} content='test' />
             }
 
             <div className='flex flex-col gap-2'>
@@ -107,7 +107,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white" onClick={() => navigate(`/post/${id}`)}>{title}</h2>
-                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content}</h2> : ''}
+                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
                 <div className='flex items-center gap-2 w-12'>
                     {tags && tags.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
@@ -501,7 +501,7 @@ const Home = () => {
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ? 
                         data.map(element =>
-                            <Post username={element.users.username} profilepic={element.users.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={content}/>
+                            <Post username={element.users.username} profilepic={element.users.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content}/>
                         ) :
                          <Loader size={30}/>
                         }

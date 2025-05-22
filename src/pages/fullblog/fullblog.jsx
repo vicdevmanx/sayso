@@ -56,7 +56,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
                     ))}
                 </div>
-                <p className='text-sm'>{data.content}</p>
+                <p className='text-sm'>{data.content} || test content</p>
 
                 <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
                     <img
