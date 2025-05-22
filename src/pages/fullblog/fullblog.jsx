@@ -59,11 +59,11 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                 <p className='text-sm'>{data.content} || test content</p>
 
                 <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
-                    <img
+                    {/* <img
                         src={data.image_url}
                         alt="Blog Avatar"
                         className="w-full"
-                    />
+                    /> */}
                 </div>
 
                 <div className='w-full b-0 h-full flex relative items-center gap-4 bg-[#1c1f26] p-2 rounded-lg'>
