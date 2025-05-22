@@ -7,7 +7,7 @@ import clsx from 'clsx'
 import { toast, Toaster } from 'sonner'
 
 
-const CreatePost = ({ title, content, tags, category, image }) => {
+const CreatePost = ({ title, content, tags, category, image, id }) => {
     const PostImgRef = useRef(null);
     const [PostImg, setPostImg] = useState(image || null);
     const navigate = useNavigate();
@@ -70,18 +70,22 @@ const handlePostSubmit = async () => {
     formdata.append("category", formData.category);
     formdata.append("tags", allTags);
     imageFile && formdata.append("image", imageFile, "file")
-    
-    let requestOptions = {
-      method: 'POST',
-      body: formdata,
-      redirect: 'follow'
-    };
+
+      let requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow'
+      };
 
     try{
-        // const response = await fetch()
+        const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
+        const result = await response.json();
+        console.log(result)
+        toast.success('Post created successfully')
+        navigate('/')
+        
 
-
-        //clear fields if successfull
+        //clear fields if successfully
         setPostImg(null)
         setImageFile(null)
         setAllTags([])
@@ -111,15 +115,19 @@ const handleEditSubmit = async () => {
     imageFile && formdata.append("image", imageFile, "file")
     
     let requestOptions = {
-      method: 'POST',
-      body: formdata,
-      redirect: 'follow'
-    };
+        method: 'PUT',
+        body: formdata,
+        redirect: 'follow'
+      };
 
     try{
-        // const response = await fetch()
+        const response = await fetch("https://sayso-seven.vercel.app/api/posts", requestOptions);
+        const result = await response.json();
+        console.log(result)
+        toast.success('Post Edited successfully')
+        navigate('/')
 
-        //clear fields if successfull
+        //clear fields if successfully
         setPostImg(null)
         setImageFile(null)
         setAllTags([])
