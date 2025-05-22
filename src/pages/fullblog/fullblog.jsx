@@ -43,7 +43,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                     <div className='flex gap-2 items-center'>
                         <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' /><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={data?.users?.image_url} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
                         <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
-                            <p className="text-white text-[13px]">{data.users.username || 'anonymous'}</p>
+                            <p className="text-white text-[13px]">{data?.users.username || 'anonymous'}</p>
                             <p className='flex items-center gap-1.5 text-xs'>{date || 'today'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime || '20 min'} read </p>
                         </div>
                     </div>
@@ -54,13 +54,13 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                         />
                     </div>
                 </div>
-                <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data.title}</h1>
+                <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data?.title}</h1>
                 <div className='flex gap-2 flex-wrap items-center'>
-                    {data.tags && data.tags.map((tag) => (
+                    {data?.tags && data?.tags.map((tag) => (
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
                     ))}
                 </div>
-                <p className='text-sm'>{data.content} || test content</p>
+                <p className='text-sm'>{data?.content} || test content</p>
 
                 <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
                     {/* <img
