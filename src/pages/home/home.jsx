@@ -416,6 +416,8 @@ const Home = () => {
 
     const currentUser = localStorage.getItem('user');
 
+    currentUser && console.log(currentUser)
+
     return (
         <div>
             <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000'>
