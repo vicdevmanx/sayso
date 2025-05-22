@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import clsx from 'clsx'
 import { toast, Toaster } from 'sonner'
+import Loader from '@/assets/loader/loader';
 
 
 const CreatePost = ({ title, content, tags, category, image, id }) => {
@@ -78,13 +79,15 @@ const handlePostSubmit = async () => {
       };
 
     try{
-        const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
+        setLoading(true)
+        const response = await fetch(`https://sayso-seven.vercel.app/api/posts`, requestOptions);
         const result = await response.json();
         console.log(result)
         toast.success('Post created successfully')
         navigate('/')
         
-
+if(response.ok) setLoading(false)
+else setLoading(false)
         //clear fields if successfully
         setPostImg(null)
         setImageFile(null)
@@ -97,6 +100,7 @@ const handlePostSubmit = async () => {
         })
         /////////
     }catch(err) {
+        setLoading(false)
         console.log(err)
     }
 }
@@ -121,12 +125,15 @@ const handleEditSubmit = async () => {
       };
 
     try{
-        const response = await fetch("https://sayso-seven.vercel.app/api/posts", requestOptions);
+        setLoading(true)
+        const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
         const result = await response.json();
         console.log(result)
         toast.success('Post Edited successfully')
         navigate('/')
 
+        if(response.ok) setLoading(false)
+        else setLoading(false)
         //clear fields if successfully
         setPostImg(null)
         setImageFile(null)
@@ -139,6 +146,7 @@ const handleEditSubmit = async () => {
         })
         /////////
     }catch(err) {
+        setLoading(false)
         console.log(err)
     }
 }
@@ -288,12 +296,17 @@ const handleEditSubmit = async () => {
 
             <button
                     type='submit'
-                    className='p-3 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'
+                    disable={loading}
+                    className='p-3 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
                 onClick={() => {
                     title ? handleEditSubmit() : handlePostSubmit()
                     
                 }}>
-                    Post
+                     {loading ?
+                                            <> <Loader/> size='16px' /> <p>Creating Post...</p></>
+                                            :
+                                            <p> Post </p>
+                                        }
             </button>
 
         </div>
