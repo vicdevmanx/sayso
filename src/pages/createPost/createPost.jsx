@@ -303,7 +303,7 @@ const handleEditSubmit = async () => {
                     
                 }}>
                      {loading ?
-                                            <> <Loader/> size='16px' /> <p>Creating Post...</p></>
+                                            <> <Loader size='16px'/> <p>Creating Post...</p></>
                                             :
                                             <p> Post </p>
                                         }
