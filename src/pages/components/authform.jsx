@@ -95,7 +95,7 @@ const Signup = ({ func }) => {
                 const result = await response.json()
                 setLoading(false);
                 toast.success('Signed successfully');
-                localStorage.setItem('user', result)
+                localStorage.setItem('user', JSON.stringify(result))
                 console.log(result);
                 navigate('/')
 

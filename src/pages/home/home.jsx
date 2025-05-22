@@ -414,7 +414,7 @@ const Home = () => {
         setFilterOpen(!filterOpen)
     }
 
-    const currentUser = localStorage.getItem('user');
+    const currentUser = JSON.parse(localStorage.getItem('user'));
 
     currentUser && console.log(currentUser)
 
@@ -441,7 +441,7 @@ const Home = () => {
                             </Button>
                         )
                     }
-{currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer' onClick={() => navigate('/profile')}><img className='w-full h-auto' src={currentUser.image_url}/></div>
+{currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer' onClick={() => navigate('/profile')}><img className='w-full h-auto' src={currentUser.image_url || heroImg}/></div>
                   :  <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
 }</div>
             </div>
