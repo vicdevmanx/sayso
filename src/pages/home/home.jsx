@@ -428,9 +428,9 @@ const Home = () => {
         try {
             const response = await fetch("https://sayso-seven.vercel.app/api/posts", requestOptions);
 
-            const result = response.json();
+            const result =await response.json();
             console.log(result)
-            // setData(result)
+            setData(result)
 
         } catch(err) {
             console.log(err)
