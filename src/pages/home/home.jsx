@@ -430,7 +430,7 @@ const Home = () => {
 
             const result = response.json();
             console.log(result)
-            setData(result)
+            // setData(result)
 
         } catch(err) {
             console.log(err)
