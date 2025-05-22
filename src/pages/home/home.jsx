@@ -1,4 +1,4 @@
-import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowUpCircle } from "lucide-react";
+import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import sayso from '../../assets/sayso assets/sayso.svg'
 import clsx from 'clsx'
@@ -12,6 +12,7 @@ import imageOne from '../../assets/logo2.jpg'
 import './home.css'
 import InfoDisplay from "../components/trigger";
 import { useNavigate } from 'react-router-dom'
+import heroImg from '../../assets/hero.png'
 
 function FullPageInfo() {
     const isMobile = useMediaQuery('(max-width: 700px)');
@@ -28,7 +29,7 @@ function FullPageInfo() {
                     <div className=' flex items-center gap-1'> <input
                         className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
                         placeholder='Comment'
-                    /> <ArrowUpCircle className='bg-[#272b34] p-2 rounded-xl size-11 w-16 px-2' /> </div>
+                    /> <ArrowRight className='bg-[#272b34] p-3 rounded-xl size-11 w-14' /> </div>
                     : <></>
                 }
                 <div className={clsx('rounded-xl', isMobile ? 'w-full':'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
@@ -59,11 +60,12 @@ function FullPageInfo() {
 }
 
 export function More() {
+    const navigate = useNavigate();
     return (
         <div className='flex flex-col items-center gap-4 font-[poppins-medium] p-6'>
             <p className='text-white font-[poppins-bold]'>What do you Wanna do?</p>
             <div className='flex gap-2 text-md text-white'>
-                <Button className='flex gap-1 items-center bg-[#272b34]'><Pencil className='size-4' /> <p>Edit Post</p></Button>
+                <Button className='flex gap-1 items-center bg-[#272b34]' onClick={() => navigate('/editPost/1')}><Pencil className='size-4' /> <p>Edit Post</p></Button>
                 <Button className='flex gap-1 items-center bg-[#272b34]'><Trash className='text-red-500 size-4' /> <p>Delete Post</p></Button>
             </div></div>
     );
@@ -104,9 +106,9 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white">{title}</h2>
                 {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{title}</h2> : ''}
-                <div className='flex items-center gap-2'>
-                    {tags.map(tags =>
-                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tags}</p>
+                <div className='flex items-center gap-2 w-12'>
+                    {tags && tags.map(tag =>
+                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
                     )
                     }
                     {/* // <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer'>+ 1</p> */}
@@ -160,7 +162,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                     <div className='mt-2 flex items-center gap-1'> <input
                         className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
                         placeholder='Comment'
-                    /><ArrowUpCircle className='bg-[#272b34] p-2 rounded-xl size-11 w-16 px-2' /></div> : ''
+                    /><ArrowRight className='bg-[#272b34] p-3 rounded-xl size-11 w-14' /></div> : ''
                 }
             </div>
         </div>
@@ -174,6 +176,7 @@ const Home = () => {
 
     const [isFocused, setIsFocused] = useState(false)
     const inputRef = useRef(null);
+    const navigate = useNavigate();
 
     const handleInputRef = () => {
         setTimeout(() => {
@@ -411,6 +414,8 @@ const Home = () => {
         setFilterOpen(!filterOpen)
     }
 
+    const currentUser = localStorage.getItem('user');
+
     return (
         <div>
             <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000'>
@@ -434,14 +439,19 @@ const Home = () => {
                             </Button>
                         )
                     }
-
-                    <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
-                </div>
+{currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer' onClick={() => navigate('/profile')}><img className='w-full h-auto' src={currentUser.image_url}/></div>
+                  :  <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
+}</div>
             </div>
 
-            <div className='w-full h-[90vh] bg-gradient-to-r from-blue-500 to-pink-500 flex items-center flex-col gap-4 justify-center'>
-                <p className='text-xl font-[poppins-bold] text-center leading-snug'><br /> Say More With Sayso</p>
-                <Button className='bg-[#272b34]' onClick={() => setAuthActive(true)}>Get Started</Button>
+            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' style={{backgroundImage: `url(${heroImg})`}}>
+                <div className='absolute bg-[#000000aa] insert-0 w-full h-full'></div>
+                <p className='text-2xl font-[poppins-bold] text-center leading-snug z-100'><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
+                {currentUser ? 
+                <div className='flex gap-2 items-center'>
+                    <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
+                </div> 
+                : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
             </div>
 
 
@@ -489,7 +499,7 @@ const Home = () => {
 
             <Drawer
                 anchor="bottom"
-                open={AuthActive}
+                open={AuthActive && !currentUser}
                 onClose={() => setAuthActive(false)}
                 onOpen={() => setAuthActive(true)}
                 transitionDuration={200}

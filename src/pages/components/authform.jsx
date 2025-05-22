@@ -38,7 +38,7 @@ const Signup = ({ func }) => {
 
     const profileImgRef = useRef(null);
     const [profileImg, setProfileImg] = useState(null);
-    const [mainPicFile, setMainPicFile] = useState('');
+    const [mainPicFile, setMainPicFile] = useState(null);
 
     const handleFileUpload = () => {
         profileImgRef.current?.click();
@@ -68,7 +68,7 @@ const Signup = ({ func }) => {
         formdata.append("fullname", "anonymous");
         formdata.append("username", formData.username);
         formdata.append("bio", formData.bio);
-        formdata.append("profilePic", mainPicFile, "file");
+        {mainPicFile && formdata.append("profilePic", mainPicFile, "file")}
 
         var requestOptions = {
             method: 'POST',
@@ -94,10 +94,20 @@ const Signup = ({ func }) => {
             
                 const result = await response.json()
                 setLoading(false);
-                toast.success(result.message);
-                // localStorage.setItem('user', result)
+                toast.success('Signed successfully');
+                localStorage.setItem('user', result)
                 console.log(result);
                 navigate('/')
+
+                setFormData({
+                    username: '',
+                    email: '',
+                    password: '',
+                    bio: ''
+                });
+
+                setProfileImg(null)
+                setMainPicFile(null)
            
 
         }

@@ -1,5 +1,5 @@
 import InfoDisplay from "../components/trigger";
-import { User, MoreHorizontal, ThumbsUp, ThumbsDown, MessageCircleMore, Share, ArrowUpCircle, Pencil, Trash, ChevronLeft } from "lucide-react";
+import { User, MoreHorizontal, ThumbsUp, ThumbsDown, MessageCircleMore, Share, ArrowRight, Pencil, Trash, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { More } from "../home/home";
 import { useState, useEffect } from "react";
@@ -8,7 +8,7 @@ import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
 
-const Fullblog = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment }) => {
+const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice', 'good'], postImg, likes, comment }) => {
     const [liked, setLiked] = useState(false)
     const [dislike, setDisLiked] = useState(false)
     const isMobile = useMediaQuery('(max-width: 700px)');
@@ -24,7 +24,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags, postImg, 
             <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
                 <div className='flex justify-between w-full items-center'>
                     <div className='flex gap-2 items-center'>
-                        <ChevronLeft  onClick={() => navigate('/')} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]'/><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
+                        <ChevronLeft  onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]'/><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
                         <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                             <p className="text-white text-[13px]">{id} {username || 'anonymous'}</p>
                             <p className='flex items-center gap-1.5 text-xs'>{date || 'today'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime || '12 min'} read </p>
@@ -38,6 +38,11 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags, postImg, 
                     </div>
                 </div>
                 <h1 className="text-2xl font-[poppins-bold] text-white mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit, ?</h1>
+                <div className='flex gap-2 flex-wrap items-center'>
+                {tags && tags.map((tag) => (
+                <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
+                ))}
+                </div>
                 <p className='text-sm'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo iusto iste quas illo culpa aperiam distinctio voluptas ab vel eius adipisci, quasi delectus quae eum sequi possimus nostrum hic voluptatem.</p>
 
                 <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
@@ -88,7 +93,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags, postImg, 
                         <div className=' flex items-center gap-1'> <input
                             className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
                             placeholder='Comment'
-                        /> <ArrowUpCircle className='bg-[#272b34] p-2 rounded-xl size-11 w-16 px-2' /> </div>
+                        /> <ArrowRight className='bg-[#272b34] p-3 rounded-xl size-11 w-14' /> </div>
                         : <></>
                     }
                     <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-108', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>

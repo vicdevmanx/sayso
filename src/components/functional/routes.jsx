@@ -4,6 +4,7 @@ import CreatePost from "../../pages/createPost/createPost.jsx";
 import Home from "../../pages/home/home.jsx";
 import Profile from "../../pages/profile/profile.jsx";
 import Fullblog from "@/pages/fullblog/fullblog.jsx";
+import EditPost from "@/pages/editpost/editpost.jsx";
 
 export const routes = createBrowserRouter([
     {
@@ -27,6 +28,10 @@ export const routes = createBrowserRouter([
             {
                 path: "/post/:id",
                 element:<Fullblog />,
+            },
+            {
+                path: "/editpost/:id",
+                element:<EditPost />,
             }
 
 ])
