@@ -14,20 +14,33 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
     const isMobile = useMediaQuery('(max-width: 700px)');
     const navigate = useNavigate()
     const { id } = useParams()
+    const [data, setData] = useState({})
 
-    useEffect(() => {
+    const fetchPost = async () => {
+        try {
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+            };
 
-    })
+            const response = await fetch("https://sayso-seven.vercel.app/posts/id", requestOptions);
+            const result = await response.json();
+            console.log(result)
+            setData(result)
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     return (
         <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
             <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
                 <div className='flex justify-between w-full items-center'>
                     <div className='flex gap-2 items-center'>
-                        <ChevronLeft  onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]'/><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
+                        <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' /><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={data.users.image_url} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
                         <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
-                            <p className="text-white text-[13px]">{id} {username || 'anonymous'}</p>
-                            <p className='flex items-center gap-1.5 text-xs'>{date || 'today'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime || '12 min'} read </p>
+                            <p className="text-white text-[13px]">{id} {data.users.username || 'anonymous'}</p>
+                            <p className='flex items-center gap-1.5 text-xs'>{date || 'today'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime || '20 min'} read </p>
                         </div>
                     </div>
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
@@ -37,17 +50,17 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                         />
                     </div>
                 </div>
-                <h1 className="text-2xl font-[poppins-bold] text-white mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit, ?</h1>
+                <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data.title}</h1>
                 <div className='flex gap-2 flex-wrap items-center'>
-                {tags && tags.map((tag) => (
-                <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
-                ))}
+                    {data.tags && data.tags.map((tag) => (
+                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
+                    ))}
                 </div>
-                <p className='text-sm'>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quo iusto iste quas illo culpa aperiam distinctio voluptas ab vel eius adipisci, quasi delectus quae eum sequi possimus nostrum hic voluptatem.</p>
+                <p className='text-sm'>{data.content}</p>
 
                 <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
                     <img
-                        src="https://via.placeholder.com/150"
+                        src={data.image_url}
                         alt="Blog Avatar"
                         className="w-full"
                     />
@@ -63,7 +76,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                                     setLiked(true)
                                 }} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent ' />
 
-                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{likes || 0}</p>
+                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{data.like_count || 0}</p>
                         </span>
                         <span className='p-2 py-1.5 rounded-xl hover:bg-[#EF444450] active:bg-[#EF444450] transition'>
                             {!dislike ? <ThumbsDown onClick={() => setDisLiked(true)} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent' />
@@ -73,7 +86,7 @@ const Fullblog = ({ username, profilepic, readtime, date, title, tags = ['nice',
                     </div>
                     <div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
                         <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />
-                        <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment || 0}</p>
+                        <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{data.comment_count || 0}</p>
                     </div>
 
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl'>

@@ -73,11 +73,12 @@ export function More() {
 
 }
 
-const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review }) => {
+const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content }) => {
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [liked, setLiked] = useState(false)
     const [dislike, setDisLiked] = useState(false)
     const [msgOpen, setMsgOpen] = useState(false)
+    const navigate = useNavigate();
 
 
 
@@ -105,8 +106,8 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                 </div>
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
-                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white">{title}</h2>
-                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{title}</h2> : ''}
+                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white" onClick={() => navigate(`/post/${id}`)}>{title}</h2>
+                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content}</h2> : ''}
                 <div className='flex items-center gap-2 w-12'>
                     {tags && tags.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
@@ -117,7 +118,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                 </div>
             </div>
             <div className='p-2 pt-0 pb-0'>
-                <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden')}>
+                <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden')} onClick={() => navigate(`/post/${id}`)}>
                     <img loading="lazy" src={postImg || imageOne} className='object-fit w-full h-auto' />
                 </div>
             </div>
@@ -153,7 +154,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl'>
                         <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' />
                     </div>
-                    <p className='bg-white rounded-lg p-1.5 py-1 absolute right-0 text-black text-[13px] items-center gap-1 font-[poppins-medium] readMore'> Read
+                    <p className='bg-white rounded-lg p-1.5 py-1 absolute right-0 text-black text-[13px] items-center gap-1 font-[poppins-medium] readMore' onClick={() => navigate(`/post/${id}`)}> Read
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                         </svg>
@@ -469,7 +470,7 @@ const Home = () => {
                             </Button>
                         )
                     }
-                    {currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto h-11' src={currentUser.image_url || heroImg} /></div>
+                    {currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-12 object-fit' src={currentUser.image_url || heroImg} /></div>
                         : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
                     }</div>
             </div>
@@ -500,7 +501,7 @@ const Home = () => {
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ? 
                         data.map(element =>
-                            <Post username={element.users.username} profilepic={element.users.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} />
+                            <Post username={element.users.username} profilepic={element.users.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={content}/>
                         ) :
                          <Loader size={30}/>
                         }
