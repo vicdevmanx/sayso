@@ -226,7 +226,7 @@ const Signup = ({ func }) => {
                 />{err.password && <p className='text-red-500 text-sm'>{err.password}</p>}
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2 '>
-                <button className="cursor-pointer py-4 from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-semibold] flex justify-center items-center gap-2" onClick={handleSignup} disabled={loading}>
+                <button className="cursor-pointer py-4 bg-gradient-to-r  from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2" onClick={handleSignup} disabled={loading}>
                     {loading ?
                         <> <Loader size='16px' /> <p>Signing up...</p></>
                         :
@@ -316,7 +316,7 @@ const Login = ({ func }) => {
                 />
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2'>
-                <button className="py-4from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-semibold] flex justify-center items-center gap-2" onClick={handleLogin} disabled={loading}>
+                <button className="py-4 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2" onClick={handleLogin} disabled={loading}>
                     {loading ?
                         <> <Loader size='16px' /> <p>Logging in...</p></>
                         :
