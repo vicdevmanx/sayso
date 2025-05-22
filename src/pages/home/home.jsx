@@ -13,6 +13,7 @@ import './home.css'
 import InfoDisplay from "../components/trigger";
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../../assets/hero.png'
+import Loader from "@/assets/loader/loader";
 
 function FullPageInfo() {
     const isMobile = useMediaQuery('(max-width: 700px)');
@@ -24,16 +25,16 @@ function FullPageInfo() {
             }
 
             <div className='flex flex-col gap-2'>
-                <p className='font-[poppins-bold] text-lg' style={{textAlign: isMobile ? 'center' : 'left'}}>Comments</p>
-                { isMobile ?
+                <p className='font-[poppins-bold] text-lg' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
+                {isMobile ?
                     <div className=' flex items-center gap-1'> <input
                         className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
                         placeholder='Comment'
                     /> <ArrowRight className='bg-[#272b34] p-3 rounded-xl size-11 w-14' /> </div>
                     : <></>
                 }
-                <div className={clsx('rounded-xl', isMobile ? 'w-full':'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
-                  
+                <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
+
 
                     <div className='flex flex-col gap-2 font-[poppins] text-[13px]'>
                         <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 items-start'>
@@ -42,8 +43,8 @@ function FullPageInfo() {
                                 <span className='font-[poppins-medium] w-full text-sm'>username</span><br />
                                 <span>Lorem ipsum dolor sit amet consectetur repellat autem!</span> <br />
                                 <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                    <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' /> 
-                                    <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full'/></span>
+                                    <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                    <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' /></span>
                             </p>
 
                         </div>
@@ -51,7 +52,7 @@ function FullPageInfo() {
 
 
                 </div>
-                
+
             </div>
 
         </div>
@@ -90,7 +91,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
         }} className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
-                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
+                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} loading="lazy" className='object-fit w-full h-auto' /> && <User size={18} />}</div>
                     <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                         <p className="text-white text-[13px]">{username}</p>
                         <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
@@ -117,7 +118,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
             </div>
             <div className='p-2 pt-0 pb-0'>
                 <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden')}>
-                    <img src={imageOne} className='object-fit w-full h-auto' />
+                    <img loading="lazy" src={postImg || imageOne} className='object-fit w-full h-auto' />
                 </div>
             </div>
             <div className='px-2 select-none'>
@@ -185,7 +186,9 @@ const Home = () => {
         setIsFocused(true)
     }
 
-    const data = [
+
+
+    const startData = [
         {
             username: "JohnDoe",
             profilePicture: "https://via.placeholder.com/150",
@@ -408,11 +411,36 @@ const Home = () => {
         }
     ]
 
+    const [data, setData] = useState(null);
 
     const [filterOpen, setFilterOpen] = useState(false);
     const filter = () => {
         setFilterOpen(!filterOpen)
     }
+
+    const fetchPosts = async () => {
+
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
+
+        try {
+            const response = await fetch("https://sayso-seven.vercel.app/api/posts", requestOptions);
+
+            const result = response.json();
+            console.log(result)
+            setData(result)
+
+        } catch(err) {
+            console.log(err)
+
+        }
+    }
+
+    useEffect(() => {
+        fetchPosts()
+    }, [])
 
     const currentUser = JSON.parse(localStorage.getItem('user'));
 
@@ -441,19 +469,19 @@ const Home = () => {
                             </Button>
                         )
                     }
-{currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='w-auto h-11' src={currentUser.image_url || heroImg}/></div>
-                  :  <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
-}</div>
+                    {currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto h-11' src={currentUser.image_url || heroImg} /></div>
+                        : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
+                    }</div>
             </div>
 
-            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' style={{backgroundImage: `url(${heroImg})`}}>
+            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full'></div>
                 <p className='text-2xl font-[poppins-bold] text-center leading-snug z-100'><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
-                {currentUser ? 
-                <div className='flex gap-2 items-center'>
-                    <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
-                </div> 
-                : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
+                {currentUser ?
+                    <div className='flex gap-2 items-center'>
+                        <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
+                    </div>
+                    : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
             </div>
 
 
@@ -470,9 +498,11 @@ const Home = () => {
                         </div>
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
-                        {data.map(element =>
-                            <Post username={element.username} profilepic={element.profilePicture} readtime={element.readTime} date={element.date} title={element.postTitle} tags={element.tags} postImg={element.postImage} likes={element.likes} comment={element.comments} review={false} />
-                        )
+                        {data ? 
+                        data.map(element =>
+                            <Post username={element.users.username} profilepic={element.users.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} />
+                        ) :
+                         <Loader size={30}/>
                         }
                     </div>
 
