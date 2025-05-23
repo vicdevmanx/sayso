@@ -92,7 +92,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
         }} className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
-                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} loading="lazy" className='object-fit w-full h-auto' /> && <User size={18} />}</div>
+                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} loading="lazy" className='object-fit w-full h-auto' /> || <User size={18} />}</div>
                     <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                         <p className="text-white text-[13px]">{username}</p>
                         <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
@@ -501,7 +501,7 @@ const Home = () => {
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ? 
                         data.map(element =>
-                            <Post username={element.users.username} profilepic={element.users.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content}/>
+                            <Post username={element.users.username} profilepic={element?.users?.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content}/>
                         ) :
                          <Loader size={30}/>
                         }
