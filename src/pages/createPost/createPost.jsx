@@ -75,7 +75,8 @@ const handlePostSubmit = async () => {
       let requestOptions = {
         method: 'POST',
         body: formdata,
-        redirect: 'follow'
+        redirect: 'follow',
+        credentials: "include"
       };
 
     try{
@@ -121,7 +122,8 @@ const handleEditSubmit = async () => {
     let requestOptions = {
         method: 'PUT',
         body: formdata,
-        redirect: 'follow'
+        redirect: 'follow',
+        credentials: "include"
       };
 
     try{
