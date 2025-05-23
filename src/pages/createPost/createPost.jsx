@@ -85,7 +85,7 @@ const handlePostSubmit = async () => {
         const result = await response.json();
         console.log(result)
         toast.success('Post created successfully')
-        navigate('/')
+        // navigate('/')
         
 if(response.ok) setLoading(false)
 else setLoading(false)
@@ -132,7 +132,7 @@ const handleEditSubmit = async () => {
         const result = await response.json();
         console.log(result)
         toast.success('Post Edited successfully')
-        navigate('/')
+        // navigate('/')
 
         if(response.ok) setLoading(false)
         else setLoading(false)
