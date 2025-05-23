@@ -15,13 +15,36 @@ import { useNavigate } from 'react-router-dom'
 import heroImg from '../../assets/hero.png'
 import Loader from "@/assets/loader/loader";
 
-function FullPageInfo() {
+function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 700px)');
     const navigate = useNavigate()
+
+    const fetchComments = async () => {
+
+
+        const requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+          };
+
+        try{
+            const response = await fetch(`https://sayso-seven.vercel.app/api/${id}/comments`, requestOptions)
+            const result = await response.json();
+
+            console.log(result)
+        }
+        catch(err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchComments()
+    },[])
     return (
         <div className={clsx('flex', isMobile ? 'p-0' : 'p-4', 'gap-2', 'text-white')}>
             {isMobile ? <></> :
-                <Post username={'amaka'} profilepic='' readtime='12 min' date='nn' title='bubububu' tags={['hey', 'hi']} postImg='' likes={12} comment='2' review={true} id={1} content='test' />
+                <Post username={username} profilepic={profilepic} readtime='20 mins' date={date} title={title} tags={tags} postImg={postImg} likes={likes} comment={comment} review={true} id={1} content={content} />
             }
 
             <div className='flex flex-col gap-2'>
@@ -60,13 +83,13 @@ function FullPageInfo() {
 
 }
 
-export function More() {
+export function More(id) {
     const navigate = useNavigate();
     return (
         <div className='flex flex-col items-center gap-4 font-[poppins-medium] p-6'>
             <p className='text-white font-[poppins-bold]'>What do you Wanna do?</p>
             <div className='flex gap-2 text-md text-white'>
-                <Button className='flex gap-1 items-center bg-[#272b34]' onClick={() => navigate('/editPost/1')}><Pencil className='size-4' /> <p>Edit Post</p></Button>
+                <Button className='flex gap-1 items-center bg-[#272b34]' onClick={() => navigate(`/editPost/${id}`)}><Pencil className='size-4' /> <p>Edit Post</p></Button>
                 <Button className='flex gap-1 items-center bg-[#272b34]'><Trash className='text-red-500 size-4' /> <p>Delete Post</p></Button>
             </div></div>
     );
@@ -92,7 +115,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
         }} className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
-                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={profilepic} loading="lazy" className='object-fit w-full h-auto' /> || <User size={18} />}</div>
+                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic} loading="lazy" className='object-fit w-full h-auto' /> || <User size={18} />}</div>
                     <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                         <p className="text-white text-[13px]">{username}</p>
                         <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
@@ -101,6 +124,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                 <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
                     <InfoDisplay
                         info={More}
+                        infoProps = {{ id: id }}
                         trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
                     />
                 </div>
@@ -146,6 +170,7 @@ const Post = ({ username, profilepic, readtime, date, title, tags, postImg, like
                     </div> :
                         <InfoDisplay
                             info={FullPageInfo}
+                            infoProps = {{ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }}
                             trigger={<div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
                                 <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />   <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment}</p>
                             </div>}
@@ -470,7 +495,7 @@ const Home = () => {
                             </Button>
                         )
                     }
-                    {currentUser ? <div className='w-11 h-11 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-12 object-fit' src={currentUser.image_url || heroImg} /></div>
+                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.image_url || heroImg} /></div>
                         : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
                     }</div>
             </div>

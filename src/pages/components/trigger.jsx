@@ -3,7 +3,7 @@ import { Modal, Box } from "@mui/material";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { X } from "lucide-react";
 
-export default function InfoDisplay({ info: InfoComponent, trigger }) {
+export default function InfoDisplay({ info: InfoComponent, infoProps = {}, trigger }) {
   const [isMobile, setIsMobile] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -33,7 +33,7 @@ export default function InfoDisplay({ info: InfoComponent, trigger }) {
           <DrawerContent className=" border-0 px-2 bg-[#1c1f26]">
           <div className="text-white flex flex-col items-center ">
               <div className='bg-[#444455] w-12 h-1 rounded-full mb-2 -mt-2'></div>
-              <InfoComponent />
+              <InfoComponent {...infoProps} />
             </div>
           </DrawerContent>
         </Drawer>
@@ -54,7 +54,7 @@ export default function InfoDisplay({ info: InfoComponent, trigger }) {
             }}
           >
             <div className="">
-              <InfoComponent />
+              <InfoComponent {...infoProps} />
             </div>
           </Box>
         </Modal>
