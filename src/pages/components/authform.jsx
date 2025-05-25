@@ -65,10 +65,9 @@ const Signup = ({ func }) => {
         var formdata = new FormData();
         formdata.append("email", formData.email);
         formdata.append("password", formData.password);
-        formdata.append("fullname", "anonymous");
         formdata.append("username", formData.username);
-        formdata.append("bio", formData.bio);
-        {mainPicFile && formdata.append("profilePic", mainPicFile, "file")}
+        // formdata.append("bio", formData.bio);
+        {mainPicFile && formdata.append("image", mainPicFile, "file")}
 
         var requestOptions = {
             method: 'POST',
@@ -77,8 +76,8 @@ const Signup = ({ func }) => {
         };
 
         try {
-
-            if (!formData.username || !formData.email || !formData.password || !formData.bio) {
+// !formData.bio
+            if (!formData.username || !formData.email || !formData.password) {
                 toast.error('please fill out all fields')
                 return
             }
@@ -95,7 +94,7 @@ const Signup = ({ func }) => {
                 const result = await response.json()
                 setLoading(false);
                 toast.success('Signed successfully');
-                localStorage.setItem('user', JSON.stringify(result))
+                // localStorage.setItem('user', JSON.stringify(result))
                 console.log(result);
                 navigate('/')
 
