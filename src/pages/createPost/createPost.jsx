@@ -159,7 +159,7 @@ const handleEditSubmit = async () => {
     // </div>
 
     return (
-        <div className="min-h-screen flex flex-col m-auto p-2 py-4 pb-20 w-full max-w-2xl gap-4">
+        <div className="min-h-screen flex flex-col m-auto px-2 pb-20 w-full max-w-2xl gap-4">
             <Toaster position='top-center'/>
             <div className='flex w-full items-center justify-between'>
                 <div className='flex gap-2 items-center '>
@@ -178,9 +178,9 @@ const handleEditSubmit = async () => {
                     onChange={handleChange}
                     onInput={
                         (e) => {
-                            if(e.target.value.length >= 40) {
-                                e.target.value = e.target.value.slice(0, 40)
-                                toast.error('Title should not be more than 40 characters')
+                            if(e.target.value.length >= 80) {
+                                e.target.value = e.target.value.slice(0,80)
+                                toast.error('Title should not be more than 80 characters')
                             }
                             setErr({
                                 ...err,
@@ -252,7 +252,7 @@ const handleEditSubmit = async () => {
                                 (e) => {
                                     if(e.target.value.length >= 20) {
                                         e.target.value = e.target.value.slice(0, 20)
-                                        toast.error('Category should nt be more than 20 characters')
+                                        toast.error('Category should not be more than 20 characters')
                                     }
                                 }
                             }
@@ -269,9 +269,9 @@ const handleEditSubmit = async () => {
                     onChange={handleChange}
                     onInput={
                         (e) => {
-                            if(e.target.value.length >= 1500) {
-                                e.target.value = e.target.value.slice(0, 1500)
-                                toast.error('Content should not be more than 1500 characters')
+                            if(e.target.value.length >= 6500) {
+                                e.target.value = e.target.value.slice(0, 6500)
+                                toast.error('Content should not be more than 6500 characters')
                             }
                             setErr({
                                 ...err,
@@ -305,9 +305,9 @@ const handleEditSubmit = async () => {
                     
                 }}>
                      {loading ?
-                                            <> <Loader size='16px'/> <p>Creating Post...</p></>
+                                            <> <Loader size='16px'/> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
                                             :
-                                            <p> Post </p>
+                                            <p>{ title ? 'Update Post' : 'Post'} </p>
                                         }
             </button>
 

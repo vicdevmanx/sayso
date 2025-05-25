@@ -96,7 +96,7 @@ export function More(id) {
 
 }
 
-const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content }) => {
+export const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content }) => {
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [liked, setLiked] = useState(false)
     const [dislike, setDisLiked] = useState(false)

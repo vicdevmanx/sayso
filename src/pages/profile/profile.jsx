@@ -1,29 +1,41 @@
-
+import { Pencil, User } from "lucide-react";
+import { useState } from "react";
+import { Post } from "../home/home";
+import clsx from 'clsx';
 
 const Profile = () => {
+    const [file, setFile] = useState(null)
+    const [posts, setPosts] = useState(["one", "two", "one", "two", "one", "two", "one", "two"])
+
     return (
-        <div className="min-h-screen flex flex-col items-center py-10">
-            <h1 className="text-4xl font-bold text-white mb-6">Profile Page</h1>
-            <div className="bg-[#1c1f26] shadow-lg rounded-lg p-6 w-full max-w-4xl">
-                <div className="flex flex-col items-center mb-6">
+        <div className="min-h-screen flex flex-col m-auto items-center max-w-3xl w-full p-2">
+            <div className="flex flex-col items-center my-2">
+
+                {file ? <div className="w-24 h-24 rounded-4xl mb-2 bg-[#272b34] relative">
                     <img
-                        src="https://via.placeholder.com/150"
+                        src={file}
                         alt="Profile Avatar"
-                        className="w-32 h-32 rounded-full mb-4"
-                    />
-                    <h2 className="text-2xl font-semibold text-white">John Doe</h2>
-                    <p className="text-gray-600 text-center mt-2">
-                        Lover of tech, coffee, and good vibes. 🌟
-                    </p>
-                </div>
-                
-                <div className="bg-[#272b34] p-4 rounded-lg">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Posts</h3>
-                    <ul className="space-y-2">
-                        <li className="text-gray-700">🌿 Exploring the beauty of nature</li>
-                        <li className="text-gray-700">📚 Just finished a great book!</li>
-                        <li className="text-gray-700">☕ Had an amazing coffee today</li>
-                    </ul>
+                        className="w-full"
+                    /> 
+                    <Pencil className="bg-[#1c1f26] rounded-full size-9 p-2 absolute -bottom-2 -right-2" />
+                    </div> 
+                    : <div className="relative w-24 h-24 rounded-4xl mb-2 bg-[#272b34] flex justify-center items-center">
+                        <User className="size-8" /> 
+                        <Pencil className="bg-[#1c1f26] rounded-full size-9 p-2 absolute -bottom-2 -right-2" />
+                        </div>
+                }
+                <h2 className="text-lg font-[poppins-medium] text-white">John Doe</h2>
+                <p className="text-white text-center mt-2 text-sm font-[poppins]">
+                    Lover of tech, coffee, and good vibes. 🌟
+                </p>
+            </div>
+
+            <div className="mt-4 p-4  w-full flex flex-col items-center">
+                <h3 className="text-xl font-[poppins-bold] mb-4">Recent Posts</h3>
+                <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
+                    {posts.map(() =>
+                        <Post />
+                    )}
                 </div>
             </div>
         </div>
