@@ -9,7 +9,7 @@ import { Camera, Plus } from 'lucide-react';
 
 const Signup = ({ func }) => {
 
-    const { state } = useContext(GlobalContext);
+    const { state, updateState } = useContext(GlobalContext);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -66,7 +66,7 @@ const Signup = ({ func }) => {
         formdata.append("email", formData.email);
         formdata.append("password", formData.password);
         formdata.append("username", formData.username);
-        // formdata.append("bio", formData.bio);
+        formdata.append("bio", formData.bio);
         {mainPicFile && formdata.append("image", mainPicFile, "file")}
 
         var requestOptions = {
@@ -76,8 +76,7 @@ const Signup = ({ func }) => {
         };
 
         try {
-// !formData.bio
-            if (!formData.username || !formData.email || !formData.password) {
+            if (!formData.username || !formData.email || !formData.password || !formData.bio) {
                 toast.error('please fill out all fields')
                 return
             }
@@ -88,13 +87,15 @@ const Signup = ({ func }) => {
             setLoading(true);
             
 
-            const response = await fetch("https://sayso-seven.vercel.app/api/register", requestOptions)
+            const response = await fetch(`${state.url}/register`, requestOptions)
             
             
                 const result = await response.json()
                 setLoading(false);
                 toast.success('Signed successfully');
-                // localStorage.setItem('user', JSON.stringify(result))
+                localStorage.setItem('userId', result.user.id)
+                updateState({user: result.user})
+                localStorage.setItem('authToken', result.token)
                 console.log(result);
                 navigate('/')
 
@@ -245,6 +246,8 @@ const Login = ({ func }) => {
         email: '',
         password: ''
     });
+    const { state, updateState } = useContext(GlobalContext);
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
 
@@ -255,9 +258,7 @@ const Login = ({ func }) => {
             ...formData,
             [name]: value.trim()
         })
-
     }
-
     const handleLogin = async () => {
 
         try {
@@ -267,27 +268,29 @@ const Login = ({ func }) => {
                 return
             }
             setLoading(true);
-            // const response = await fetch(`${state.url}`, {
-            //     method: 'POST',
-            //     headers: { 'content-Type': 'application/json' },
-            //     body: JSON.stringify({ username: formData.username, email: formData.email, password: formData.password, bio: formData.bio})
-            // });
-            // const result = await response.json()
-            // if (result.ok) {
-            //     setLoading(false);
-            //     toast.success(result.message);
-            //     localStorage.setItem('authToken', result.token)
-            //     console.log(result.token);
-            //     navigate('/')
-            // } else {
-            //     setLoading(false);
-            //     toast.error(`${result.message} try again!`);
-            // }
+            const response = await fetch(`${state.url}/login`, {
+                method: 'POST',
+                headers: { 'content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            const result = await response.json()
+                setLoading(false);
+                toast.success('Successfully logged in');
+                localStorage.setItem('authToken', result.token)
+                localStorage.setItem('userId', result.user.id)
+                updateState({user: result.user})
+                console.log(result.token);
+                navigate('/')
+                setFormData({
+                    email: '',
+                    password: ''
+                });
 
         }
         catch (err) {
             console.log(err)
-            toast.error(err);
+            setLoading(false);
+            toast.error('error');
         }
     }
 

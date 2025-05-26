@@ -11,7 +11,7 @@ const GlobalState = ({ children }) => {
     user: null,
     isLoggedIn: false,
     theme: 'light',
-    url: 'https://sayso-amber.vercel.app',
+    url: 'https://sayso-seven.vercel.app',
   });
 
   // Create a function to update the state

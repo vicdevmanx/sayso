@@ -1,12 +1,12 @@
 import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import sayso from '../../assets/sayso assets/sayso.svg'
+import sayso from '../../assets/sayso assets/sayso.png'
 import clsx from 'clsx'
 import { useMediaQuery } from "@mui/material";
 import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
 import Drawer from '@mui/material/Drawer';
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useContext } from 'react'
 import { Toaster } from 'sonner'
 import imageOne from '../../assets/logo2.jpg'
 import './home.css'
@@ -14,6 +14,7 @@ import InfoDisplay from "../components/trigger";
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../../assets/hero.png'
 import Loader from "@/assets/loader/loader";
+import { GlobalContext } from "@/components/functional/context";
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 700px)');
@@ -25,22 +26,22 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         const requestOptions = {
             method: 'GET',
             redirect: 'follow'
-          };
+        };
 
-        try{
+        try {
             const response = await fetch(`https://sayso-seven.vercel.app/api/${id}/comments`, requestOptions)
             const result = await response.json();
 
             console.log(result)
         }
-        catch(err) {
+        catch (err) {
             console.log(err)
         }
     }
 
     useEffect(() => {
         fetchComments()
-    },[])
+    }, [])
     return (
         <div className={clsx('flex', isMobile ? 'p-0' : 'p-4', 'gap-2', 'text-white')}>
             {isMobile ? <></> :
@@ -124,7 +125,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                 <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
                     <InfoDisplay
                         info={More}
-                        infoProps = {{ id: id }}
+                        infoProps={{ id: id }}
                         trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
                     />
                 </div>
@@ -170,7 +171,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                     </div> :
                         <InfoDisplay
                             info={FullPageInfo}
-                            infoProps = {{ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }}
+                            infoProps={{ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }}
                             trigger={<div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
                                 <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />   <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment}</p>
                             </div>}
@@ -444,6 +445,20 @@ const Home = () => {
         setFilterOpen(!filterOpen)
     }
 
+    const FilterUI = (setSelectedCategory, setSelectedTag) => {
+        return (
+            <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
+                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
+
+                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
+
+                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
+            </div>
+        )
+    }
+
+    const [SelectedTag, setSelectedTag] = useState(null)
+    const [SelectedCategory, setSelectedCategory] = useState(null)
     const fetchPosts = async () => {
 
         var requestOptions = {
@@ -452,13 +467,13 @@ const Home = () => {
         };
 
         try {
-            const response = await fetch("https://sayso-seven.vercel.app/api/posts", requestOptions);
+            const response = await fetch("https://sayso-seven.vercel.app/posts", requestOptions);
 
-            const result =await response.json();
+            const result = await response.json();
             console.log(result)
             setData(result)
 
-        } catch(err) {
+        } catch (err) {
             console.log(err)
 
         }
@@ -468,7 +483,41 @@ const Home = () => {
         fetchPosts()
     }, [])
 
-    const currentUser = JSON.parse(localStorage.getItem('user'));
+
+
+
+    const { state } = useContext(GlobalContext);
+    const [currentUser, setCurrentUser] = useState(localStorage.getItem('authToken') && state.user)
+    useEffect(() => {
+        if (!currentUser && localStorage.getItem('userId')) {
+            console.log('fetching user')
+            fetchUser(localStorage.getItem('userId'))
+        }
+    }, [])
+
+    const fetchUser = async (id) => {
+        console.log(id)
+        if (!id) return;
+        const requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
+
+        try {
+
+            const response = await fetch(state.url + `/users/${id}/profile`, requestOptions)
+            const result = await response.json();
+            console.log(result)
+            setCurrentUser(result.user)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    console.log(localStorage.getItem('userId'))
+    console.log('current user', currentUser)
+    
+
+
 
     currentUser && console.log(currentUser)
 
@@ -495,7 +544,7 @@ const Home = () => {
                             </Button>
                         )
                     }
-                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.image_url || heroImg} /></div>
+                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.profile_image_url || heroImg} /></div>
                         : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
                     }</div>
             </div>
@@ -514,21 +563,26 @@ const Home = () => {
             <div className='flex justify-center'>
 
                 <div className='flex flex-col p-2 gap-4 max-w-6xl'>
-                    <div className='flex items-center justify-center gap-4 mt-6 mb-2'>
-                        <Button className='bg-blue-500 font-[poppins-medium]'>All Posts</Button>
-                        <Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>
-                        <div className='flex gap-2 items-center overflow-hidden w-0 border-b-l' style={{ width: filterOpen ? '130px' : '0px', transition: '.3s' }}>
-                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[12px]'>Category</span>
-                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[12px]'>Tags</span>
-                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[12px]'>Keyword</span>
-                        </div>
+                    <div className='flex items-center justify-center gap-2 mt-6 mb-2'>
+                        <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
+                        <InfoDisplay
+                            info={FilterUI}
+
+                            trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
+
+                        />
+
+                        {/* <div className='flex gap-1 items-center overflow-hidden w-0 border-l-2 border-[#272b34] pl-1' style={{ width: filterOpen ? '135px' : '0px', transition: '.3s' }}>
+                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[13px] cursor-pointer'>Category</span>
+                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[13px] cursor-pointer'>Tags</span>
+                        </div> */}
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
-                        {data ? 
-                        data.map(element =>
-                            <Post username={element.users.username} profilepic={element?.users?.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content}/>
-                        ) :
-                         <Loader size={30}/>
+                        {data ?
+                            data.map(element =>
+                                <Post username={element.users.username} profilepic={element?.users?.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
+                            ) :
+                            <Loader size={30} />
                         }
                     </div>
 

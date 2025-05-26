@@ -59,99 +59,99 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
 
     }
 
-const handlePostSubmit = async () => {
-    if(!formData.title || !formData.content || !formData.category) {
-        toast.error('Please fill all the fields')
-        return
+    const handlePostSubmit = async () => {
+        if (!formData.title || !formData.content || !formData.category) {
+            toast.error('Please fill all the fields')
+            return
+        }
+
+        let formdata = new FormData();
+        formdata.append("title", formData.title);
+        formdata.append("content", formData.content);
+        formdata.append("category", formData.category);
+        formdata.append("tags", allTags);
+        imageFile && formdata.append("image", imageFile, "file")
+
+        let requestOptions = {
+            method: 'POST',
+            body: formdata,
+            redirect: 'follow',
+            credentials: "include"
+        };
+
+        try {
+            setLoading(true)
+            const response = await fetch(`https://sayso-seven.vercel.app/api/posts`, requestOptions);
+            const result = await response.json();
+            console.log(result)
+            toast.success('Post created successfully')
+            // navigate('/')
+
+            if (response.ok) setLoading(false)
+            else setLoading(false)
+            //clear fields if successfully
+            setPostImg(null)
+            setImageFile(null)
+            setAllTags([])
+            setFormData({
+                title: '',
+                content: '',
+                tag: '',
+                category: ''
+            })
+            /////////
+        } catch (err) {
+            setLoading(false)
+            console.log(err)
+        }
     }
 
-    let formdata = new FormData();
-    formdata.append("title", formData.title);
-    formdata.append("content", formData.content);
-    formdata.append("category", formData.category);
-    formdata.append("tags", allTags);
-    imageFile && formdata.append("image", imageFile, "file")
+    const handleEditSubmit = async () => {
+        if (!formData.title || !formData.content || !formData.category) {
+            toast.error('Please fill all the fields')
+            return
+        }
 
-      let requestOptions = {
-        method: 'POST',
-        body: formdata,
-        redirect: 'follow',
-        credentials: "include"
-      };
+        let formdata = new FormData();
+        formdata.append("title", formData.title);
+        formdata.append("content", formData.content);
+        formdata.append("category", formData.category);
+        formdata.append("tags", allTags);
+        imageFile && formdata.append("image", imageFile, "file")
 
-    try{
-        setLoading(true)
-        const response = await fetch(`https://sayso-seven.vercel.app/api/posts`, requestOptions);
-        const result = await response.json();
-        console.log(result)
-        toast.success('Post created successfully')
-        // navigate('/')
-        
-if(response.ok) setLoading(false)
-else setLoading(false)
-        //clear fields if successfully
-        setPostImg(null)
-        setImageFile(null)
-        setAllTags([])
-        setFormData({
-            title: '',
-            content: '',
-            tag: '',
-            category: ''
-        })
-        /////////
-    }catch(err) {
-        setLoading(false)
-        console.log(err)
+        let requestOptions = {
+            method: 'PUT',
+            body: formdata,
+            redirect: 'follow',
+            credentials: "include"
+        };
+
+        try {
+            setLoading(true)
+            const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
+            const result = await response.json();
+            console.log(result)
+            toast.success('Post Edited successfully')
+            // navigate('/')
+
+            if (response.ok) setLoading(false)
+            else setLoading(false)
+            //clear fields if successfully
+            setPostImg(null)
+            setImageFile(null)
+            setAllTags([])
+            setFormData({
+                title: '',
+                content: '',
+                tag: '',
+                category: ''
+            })
+            /////////
+        } catch (err) {
+            setLoading(false)
+            console.log(err)
+        }
     }
-}
-
-const handleEditSubmit = async () => {
-    if(!formData.title || !formData.content || !formData.category) {
-        toast.error('Please fill all the fields')
-        return
-    }
-
-    let formdata = new FormData();
-    formdata.append("title", formData.title);
-    formdata.append("content", formData.content);
-    formdata.append("category", formData.category);
-    formdata.append("tags", allTags);
-    imageFile && formdata.append("image", imageFile, "file")
-    
-    let requestOptions = {
-        method: 'PUT',
-        body: formdata,
-        redirect: 'follow',
-        credentials: "include"
-      };
-
-    try{
-        setLoading(true)
-        const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
-        const result = await response.json();
-        console.log(result)
-        toast.success('Post Edited successfully')
-        // navigate('/')
-
-        if(response.ok) setLoading(false)
-        else setLoading(false)
-        //clear fields if successfully
-        setPostImg(null)
-        setImageFile(null)
-        setAllTags([])
-        setFormData({
-            title: '',
-            content: '',
-            tag: '',
-            category: ''
-        })
-        /////////
-    }catch(err) {
-        setLoading(false)
-        console.log(err)
-    }
-}
 
     // <div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]'>{<img src={Postpic} className='object-fit w-full h-auto' /> && <User size={18} />}</div>
     // <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
@@ -160,13 +160,24 @@ const handleEditSubmit = async () => {
 
     return (
         <div className="min-h-screen flex flex-col m-auto px-2 pb-20 w-full max-w-2xl gap-4">
-            <Toaster position='top-center'/>
+            <Toaster position='top-center' />
             <div className='flex w-full items-center justify-between'>
                 <div className='flex gap-2 items-center '>
                     <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' />
-                    <h1 className='font-[poppins-bold] text-xl'>Create Post</h1>
+                    <h1 className='font-[poppins-bold] text-xl'>{title ? 'Update Post' : 'Create Post'}</h1>
                 </div>
-                <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>Post</Button>
+                <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'
+                    onClick={() => {
+                        title ? handleEditSubmit() : handlePostSubmit()
+
+                    }}>
+                    {loading ?
+                        <> <Loader size='16px' /> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
+                        :
+                        <p>{title ? 'Update Post' : 'Post'} </p>
+                    }
+
+                </Button>
             </div>
             <h1 className="text-2xl font-[poppins-bold] text-white">
                 <textarea
@@ -178,13 +189,13 @@ const handleEditSubmit = async () => {
                     onChange={handleChange}
                     onInput={
                         (e) => {
-                            if(e.target.value.length >= 80) {
-                                e.target.value = e.target.value.slice(0,80)
+                            if (e.target.value.length >= 80) {
+                                e.target.value = e.target.value.slice(0, 80)
                                 toast.error('Title should not be more than 80 characters')
                             }
                             setErr({
                                 ...err,
-                                title: `${e.target.value.length}/40`
+                                title: `${e.target.value.length}/80`
                             })
                         }
                     }
@@ -198,7 +209,7 @@ const handleEditSubmit = async () => {
                                 <p className='text-[12px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer flex items-center gap-2' key={i}>
                                     #{tag} <X onClick={() => {
                                         setAllTags(allTags.filter((_, index) => index !== i))
-                                    }} className='size-6 text-red-500 p-1 rounded-full hover:bg-[#6c5ce760] active:bg-[#6c5ce760]'/></p>
+                                    }} className='size-6 text-red-500 p-1 rounded-full hover:bg-[#6c5ce760] active:bg-[#6c5ce760]' /></p>
                             ))}
                         </div>}
                     </div>
@@ -212,7 +223,7 @@ const handleEditSubmit = async () => {
                             onChange={handleChange}
                             onInput={
                                 (e) => {
-                                    if(e.target.value.length >= 20) {
+                                    if (e.target.value.length >= 20) {
                                         e.target.value = e.target.value.slice(0, 20)
                                         toast.error('tag should not be more than 20 characters')
                                     }
@@ -220,11 +231,11 @@ const handleEditSubmit = async () => {
                             }
                         />
                         <Button className={clsx(formData.tag ? 'bg-[#6c5ce7]' : 'bg-[#272b34]')} onClick={() => {
-                            if(!formData.tag) {
+                            if (!formData.tag) {
                                 toast.error('Please enter a tag')
                                 return
                             }
-                            if(allTags.includes(formData.tag)) {
+                            if (allTags.includes(formData.tag)) {
                                 toast.error('Tag already exists')
                                 return
                             }
@@ -233,13 +244,13 @@ const handleEditSubmit = async () => {
                                 ...formData,
                                 tag: ''
                             })
-                            }}><Plus /></Button>
+                        }}><Plus /></Button>
                     </div>
                 </div>
 
 
                 <div className='flex gap-4 flex-wrap items-center'>
-                { formData.category && <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{formData.category}</p>}
+                    {formData.category && <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{formData.category}</p>}
                     <div className='w-36 flex gap-1'>
                         <input
                             type='text'
@@ -250,7 +261,7 @@ const handleEditSubmit = async () => {
                             onChange={handleChange}
                             onInput={
                                 (e) => {
-                                    if(e.target.value.length >= 20) {
+                                    if (e.target.value.length >= 20) {
                                         e.target.value = e.target.value.slice(0, 20)
                                         toast.error('Category should not be more than 20 characters')
                                     }
@@ -269,19 +280,19 @@ const handleEditSubmit = async () => {
                     onChange={handleChange}
                     onInput={
                         (e) => {
-                            if(e.target.value.length >= 6500) {
+                            if (e.target.value.length >= 6500) {
                                 e.target.value = e.target.value.slice(0, 6500)
                                 toast.error('Content should not be more than 6500 characters')
                             }
                             setErr({
                                 ...err,
-                                content: `${e.target.value.length}/1500`
+                                content: `${e.target.value.length}/6500`
                             })
                         }
                     }
                 />
             </p>
-            
+
             {err.content && <p className='text-white text-xs'>{err.content}</p>}
             <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
                 <input
@@ -297,18 +308,18 @@ const handleEditSubmit = async () => {
             </div>
 
             <button
-                    type='submit'
-                    disable={loading}
-                    className='p-3 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
+                type='submit'
+                disable={loading}
+                className='p-3 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
                 onClick={() => {
                     title ? handleEditSubmit() : handlePostSubmit()
-                    
+
                 }}>
-                     {loading ?
-                                            <> <Loader size='16px'/> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
-                                            :
-                                            <p>{ title ? 'Update Post' : 'Post'} </p>
-                                        }
+                {loading ?
+                    <> <Loader size='16px' /> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
+                    :
+                    <p>{title ? 'Update Post' : 'Post'} </p>
+                }
             </button>
 
         </div>
