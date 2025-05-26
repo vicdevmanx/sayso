@@ -47,17 +47,15 @@ const Profile = () => {
         <div className="min-h-screen flex flex-col m-auto items-center max-w-3xl w-full p-2 px-0">
             <div className="flex flex-col items-center my-2">
 
-                {currentUser?.profile_image_url ? <div className="w-24 h-24 rounded-full mb-2 bg-[#272b34] relative o">
+                {currentUser?.profile_image_url ? <div className="w-24 h-24 rounded-full mb-2 bg-[#272b34] relative overflow-hidden flex items-center justify-center">
                     <img
                         src={currentUser?.profile_image_url}
                         alt="Profile Avatar"
-                        className="w-full rounded-full"
+                        className="w-full"
                     />
-                    <Pencil className="bg-[#1c1f26] rounded-full size-9 p-2 absolute -bottom-2 -right-2" />
                 </div>
                     : <div className="relative w-24 h-24 rounded-full mb-2 bg-[#272b34] flex justify-center items-center">
                         <User className="size-8" />
-                        <Pencil className="bg-[#1c1f26] rounded-full size-9 p-2 absolute -bottom-2 -right-2" />
                     </div>
                 }
                 <h2 className="text-lg font-[poppins-medium] text-white">{currentUser?.username || <Loader size={16} />}</h2>

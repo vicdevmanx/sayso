@@ -549,7 +549,7 @@ console.log('current user:', currentUser);
                             </Button>
                         )
                     }
-                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.profile_image_url || heroImg} /></div>
+                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.profile_image_url || heroImg} /></div>
                         : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{ localStorage.getItem('authToken') ? <Loader size={18}/> : <User size={18} />}</div>
                     }</div>
             </div>

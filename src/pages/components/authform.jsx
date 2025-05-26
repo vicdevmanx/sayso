@@ -4,7 +4,7 @@ import { useContext, useState, useRef } from 'react'
 import Loader from '../../assets/loader/loader';
 import { toast } from 'sonner';
 import { GlobalContext } from '../../components/functional/context';
-import { Camera, Plus } from 'lucide-react';
+import { Camera, Eye, EyeOff, Plus } from 'lucide-react';
 
 
 const Signup = ({ func }) => {
@@ -119,6 +119,7 @@ const Signup = ({ func }) => {
         }
     }
 
+    const [seePassword, setSeePassword] = useState(false);
     return (
         <div>
             <div className="flex flex-col gap-2 p-2 text-center">
@@ -205,10 +206,11 @@ const Signup = ({ func }) => {
                     }
                     }
                 />{err.bio && <p className='text-red-500 text-sm'>{err.bio}</p>}
+                <div className='relative'>
                 <input
-                    type="password"
+                    type={seePassword ? "text" : "password"}
                     placeholder="Password"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0 w-full"
                     name='password'
                     value={formData.password}
                     onChange={handleChange}
@@ -224,7 +226,14 @@ const Signup = ({ func }) => {
                         }
                     }
                     }
-                />{err.password && <p className='text-red-500 text-sm'>{err.password}</p>}
+                />
+                {seePassword ? <Eye className='absolute right-3 top-3 text-[#717889] cursor-pointer' onClick={() => setSeePassword(false)}/> : <EyeOff className='absolute right-3 top-3 text-[#717889] cursor-pointer' onClick={() => setSeePassword(true)}/>}
+
+                </div>
+                {err.password && <p className='text-red-500 text-sm'>{err.password}</p>}
+                
+               
+
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2 '>
                 <button className="cursor-pointer py-4 bg-gradient-to-r  from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2" onClick={handleSignup} disabled={loading}>
@@ -295,6 +304,7 @@ const Login = ({ func }) => {
         }
     }
 
+    const [seePassword, setSeePassword] = useState(false);
     return (
         <div>
             <div className="flex flex-col gap-2 p-2 text-center">
@@ -309,14 +319,17 @@ const Login = ({ func }) => {
                     value={formData.email}
                     onChange={handleChange}
                 />
+                <div className='relative'>
                 <input
-                    type="password"
+                    type={seePassword ? "text" : "password"}
                     placeholder="Password"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white w-full"
                     name='password'
                     value={formData.password}
                     onChange={handleChange}
                 />
+                {seePassword ? <Eye className='absolute right-3 top-3 text-[#717889] cursor-pointer' onClick={() => setSeePassword(false)}/> : <EyeOff className='absolute right-3 top-3 text-[#717889] cursor-pointer' onClick={() => setSeePassword(true)}/>}
+                </div>
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2'>
                 <button className="py-4 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2" onClick={handleLogin} disabled={loading}>
