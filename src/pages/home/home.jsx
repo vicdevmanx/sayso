@@ -16,6 +16,7 @@ import heroImg from '../../assets/hero.png'
 import Loader from "@/assets/loader/loader";
 import { useContext } from "react";
 import { GlobalContext } from "@/components/functional/context";
+import { PostSkeleton } from "../components/postskeleton";
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 700px)');
@@ -589,7 +590,9 @@ console.log('current user:', currentUser);
                             data.map((element, i) =>
                                 <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
                             ) :
-                            <Loader size={30} />
+                            Array.from({ length: 6 }).map((_, i) =>
+                                <PostSkeleton key={i} />
+                            )
                         }
                     </div>
 
