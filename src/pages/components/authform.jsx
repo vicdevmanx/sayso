@@ -98,7 +98,7 @@ const Signup = ({ func }) => {
             localStorage.setItem('authToken', result.token)
             localStorage.setItem('userId', result.user.id)
             console.log(result);
-            navigate('/profile')
+            window.location.reload();
 
             setFormData({
                 username: '',
@@ -281,7 +281,7 @@ const Login = ({ func }) => {
             localStorage.setItem('userId', result.user.id)
             updateState({ user: result.user })
             console.log(result.token);
-            navigate('/profile')
+            window.location.reload();
             setFormData({
                 email: '',
                 password: ''

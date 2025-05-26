@@ -30,10 +30,11 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         };
 
         try {
-            const response = await fetch(`https://sayso-seven.vercel.app/api/${id}/comments`, requestOptions)
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
             const result = await response.json();
 
-            console.log(result)
+
+            console.log('comments', result)
         }
         catch (err) {
             console.log(err)
@@ -46,7 +47,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
     return (
         <div className={clsx('flex', isMobile ? 'p-0' : 'p-4', 'gap-2', 'text-white')}>
             {isMobile ? <></> :
-                <Post username={username} profilepic={profilepic} readtime='20 mins' date={date} title={title} tags={tags} postImg={postImg} likes={likes} comment={comment} review={true} id={1} content={content} />
+                <Post username={username} profilepic={profilepic} readtime={readtime} date={date} title={title} tags={tags} postImg={postImg} likes={likes} comment={comment} review={true} id={1} content={content.slice(0, 120) + '...'} />
             }
 
             <div className='flex flex-col gap-2'>
@@ -199,6 +200,14 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
 }
 
 const Home = () => {
+    const postRef = useRef(null);
+
+  const scrollToPosts = () => {
+    postRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [AuthActive, setAuthActive] = useState(false);
@@ -548,15 +557,17 @@ console.log('current user:', currentUser);
             <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full'></div>
                 <p className='text-2xl font-[poppins-bold] text-center leading-snug z-100'><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
+                <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
                 {localStorage.getItem('authToken') ?
                     <div className='flex gap-2 items-center'>
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
                     </div>
                     : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
-            </div>
+                    <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={scrollToPosts}>Explore</Button>
+            </div></div>
 
 
-            <div className='flex justify-center'>
+            <div className='flex justify-center' ref={postRef}>
 
                 <div className='flex flex-col p-2 gap-4 max-w-6xl'>
                     <div className='flex items-center justify-center gap-2 mt-6 mb-2'>

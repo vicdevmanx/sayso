@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Plus, X } from 'lucide-react';
 import { User, MoreHorizontal, ThumbsUp, ThumbsDown, MessageCircleMore, Share, ArrowRight, Pencil, Trash, ChevronLeft } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,13 @@ import Loader from '@/assets/loader/loader';
 
 
 const CreatePost = ({ title, content, tags, category, image, id }) => {
+    useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth" // remove 'behavior' for instant scroll
+  });
+}, []);
+
     const PostImgRef = useRef(null);
     const [PostImg, setPostImg] = useState(image || null);
     const navigate = useNavigate();

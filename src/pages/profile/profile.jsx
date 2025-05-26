@@ -9,6 +9,12 @@ import Loader from "@/assets/loader/loader";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+        useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth" // remove 'behavior' for instant scroll
+      });
+    }, []);
     const [file, setFile] = useState(null)
     const [currentUser, setCurrentUser] = useState(null);
     const { state } = useContext(GlobalContext); // ✅ Use context to get state
@@ -65,6 +71,7 @@ const Profile = () => {
                     localStorage.removeItem('authToken')
                     localStorage.removeItem('userId')
                     navigate('/')
+                    window.location.reload();
                 }}>Logout</Button>
             </div>
 

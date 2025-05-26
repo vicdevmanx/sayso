@@ -9,7 +9,13 @@ import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
 import Loader from "@/assets/loader/loader";
 
-const Fullblog = ({readtime, date, title, tags = ['nice', 'good'], postImg, likes, comment }) => {
+const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, likes, comment }) => {
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // remove 'behavior' for instant scroll
+        });
+    }, []);
     const [liked, setLiked] = useState(false)
     const [dislike, setDisLiked] = useState(false)
     const isMobile = useMediaQuery('(max-width: 700px)');
@@ -35,17 +41,17 @@ const Fullblog = ({readtime, date, title, tags = ['nice', 'good'], postImg, like
 
     useEffect(() => {
         fetchPost()
-    },[])
+    }, [])
 
     return (
         <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
             <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
                 <div className='flex justify-between w-full items-center'>
                     <div className='flex gap-2 items-center'>
-                        <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' /><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={data?.users?.image_url} className='object-fit w-full h-auto' /> || <User size={18} />}</div>
+                        <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' /><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={data?.users?.profile_image_url} className='object-fit w-full h-auto' /> || <User size={18} />}</div>
                         <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                             <p className="text-white text-[13px]">{data?.users?.username || 'Loading...'}</p>
-                            <p className='flex items-center gap-1.5 text-xs'>{date || 'today'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime || '20 min'} read </p>
+                            <p className='flex items-center gap-1.5 text-xs'>{data?.created_at?.slice(0, 10) || 'Loading'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {data?.read_time || 'loading...'} read </p>
                         </div>
                     </div>
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
@@ -60,9 +66,9 @@ const Fullblog = ({readtime, date, title, tags = ['nice', 'good'], postImg, like
                     {data?.tags ? typeof data?.tags !== 'string' ? data?.tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
                     ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{data?.tags}</p>
-                    : null}
+                        : null}
                 </div>
-                <p className='text-sm'>{data?.content || <Loader size={20}/>}</p>
+                <p className='text-sm'>{data?.content || <Loader size={20} />}</p>
 
                 <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
                     <img
