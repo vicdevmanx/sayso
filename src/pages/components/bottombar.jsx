@@ -2,6 +2,7 @@ import { Home, Plus, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import Profile from '../profile/profile';
 import clsx from 'clsx';
+import { toast } from 'sonner';
 
 const BottomBar = () => {
 
@@ -15,16 +16,16 @@ const BottomBar = () => {
                     </div>
                 )}
                 </NavLink>
-                <NavLink to="/createpost">
+                <NavLink to={localStorage.getItem('authToken') ? "/createpost" : '/'}>
                 {({isActive}) => (
-                <div className={clsx('p-2', 'rounded-full',  'transition', isActive ? 'text-white' : 'text-[#717889]', isActive ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
+                <div onClick={() => localStorage.getItem('authToken')  ? null : toast('To Create a Post your gonna have to signup or Login')}  className={clsx('p-2', 'rounded-full',  'transition', isActive && localStorage.getItem('authToken') ? 'text-white' : 'text-[#717889]', isActive && localStorage.getItem('authToken') ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive && localStorage.getItem('authToken') ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
                     <Plus/>
                     </div>
                 )}
                 </NavLink>
-                <NavLink to="/profile">
+                <NavLink to={localStorage.getItem('authToken') ? "/profile" : '/'}>
                 {({isActive}) => (
-                <div className={clsx('p-2', 'rounded-full',  'transition', isActive ? 'text-white' : 'text-[#717889]', isActive ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
+                <div onClick={() => localStorage.getItem('authToken')  ? null : toast('To visit Profile your gonna have to signup or Login')} className={clsx('p-2', 'rounded-full',  'transition', isActive && localStorage.getItem('authToken') ? 'text-white' : 'text-[#717889]', isActive && localStorage.getItem('authToken') ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive && localStorage.getItem('authToken') ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
                     <User/>
                     </div>
                 )}

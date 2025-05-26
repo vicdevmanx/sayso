@@ -24,7 +24,7 @@ const Fullblog = ({readtime, date, title, tags = ['nice', 'good'], postImg, like
                 redirect: 'follow'
             };
 
-            const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
             console.log(result)
             setData(result)
@@ -57,9 +57,10 @@ const Fullblog = ({readtime, date, title, tags = ['nice', 'good'], postImg, like
                 </div>
                 <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data?.title || 'loading...'}</h1>
                 <div className='flex gap-2 flex-wrap items-center'>
-                    {data?.tags && data?.tags.map((tag) => (
-                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
-                    ))}
+                    {data?.tags ? typeof data?.tags !== 'string' ? data?.tags?.map(tag =>
+                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
+                    ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{data?.tags}</p>
+                    : null}
                 </div>
                 <p className='text-sm'>{data?.content || <Loader size={20}/>}</p>
 

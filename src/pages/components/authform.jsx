@@ -67,7 +67,8 @@ const Signup = ({ func }) => {
         formdata.append("password", formData.password);
         formdata.append("username", formData.username);
         formdata.append("bio", formData.bio);
-        {mainPicFile && formdata.append("image", mainPicFile, "file")}
+        { mainPicFile && formdata.append("image", mainPicFile, "file") }
+
 
         var requestOptions = {
             method: 'POST',
@@ -85,30 +86,30 @@ const Signup = ({ func }) => {
                 return
             }
             setLoading(true);
-            
+
 
             const response = await fetch(`${state.url}/register`, requestOptions)
-            
-            
-                const result = await response.json()
-                setLoading(false);
-                toast.success('Signed successfully');
-                localStorage.setItem('userId', result.user.id)
-                updateState({user: result.user})
-                localStorage.setItem('authToken', result.token)
-                console.log(result);
-                navigate('/')
 
-                setFormData({
-                    username: '',
-                    email: '',
-                    password: '',
-                    bio: ''
-                });
 
-                setProfileImg(null)
-                setMainPicFile(null)
-           
+            const result = await response.json()
+            setLoading(false);
+            toast.success('Signed successfully');
+            updateState({ user: result.user })
+            localStorage.setItem('authToken', result.token)
+            localStorage.setItem('userId', result.user.id)
+            console.log(result);
+            navigate('/profile')
+
+            setFormData({
+                username: '',
+                email: '',
+                password: '',
+                bio: ''
+            });
+
+            setProfileImg(null)
+            setMainPicFile(null)
+
 
         }
         catch (err) {
@@ -274,17 +275,17 @@ const Login = ({ func }) => {
                 body: JSON.stringify(formData)
             });
             const result = await response.json()
-                setLoading(false);
-                toast.success('Successfully logged in');
-                localStorage.setItem('authToken', result.token)
-                localStorage.setItem('userId', result.user.id)
-                updateState({user: result.user})
-                console.log(result.token);
-                navigate('/')
-                setFormData({
-                    email: '',
-                    password: ''
-                });
+            setLoading(false);
+            toast.success('Successfully logged in');
+            localStorage.setItem('authToken', result.token)
+            localStorage.setItem('userId', result.user.id)
+            updateState({ user: result.user })
+            console.log(result.token);
+            navigate('/profile')
+            setFormData({
+                email: '',
+                password: ''
+            });
 
         }
         catch (err) {

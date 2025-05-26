@@ -71,21 +71,24 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
         formdata.append("category", formData.category);
         formdata.append("tags", allTags);
         imageFile && formdata.append("image", imageFile, "file")
+        
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
 
-        let requestOptions = {
+        var requestOptions = {
             method: 'POST',
+            headers: myHeaders,
             body: formdata,
-            redirect: 'follow',
-            credentials: "include"
+            redirect: 'follow'
         };
 
         try {
             setLoading(true)
-            const response = await fetch(`https://sayso-seven.vercel.app/api/posts`, requestOptions);
+            const response = await fetch(`https://sayso-seven.vercel.app/posts`, requestOptions);
             const result = await response.json();
             console.log(result)
             toast.success('Post created successfully')
-            // navigate('/')
+            navigate('/')
 
             if (response.ok) setLoading(false)
             else setLoading(false)

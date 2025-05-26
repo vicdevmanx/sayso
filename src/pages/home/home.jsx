@@ -6,7 +6,7 @@ import { useMediaQuery } from "@mui/material";
 import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
 import Drawer from '@mui/material/Drawer';
-import { useState, useRef, useEffect, useContext } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Toaster } from 'sonner'
 import imageOne from '../../assets/logo2.jpg'
 import './home.css'
@@ -14,6 +14,7 @@ import InfoDisplay from "../components/trigger";
 import { useNavigate } from 'react-router-dom'
 import heroImg from '../../assets/hero.png'
 import Loader from "@/assets/loader/loader";
+import { useContext } from "react";
 import { GlobalContext } from "@/components/functional/context";
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
@@ -134,10 +135,10 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white" onClick={() => navigate(`/post/${id}`)}>{title}</h2>
                 {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
                 <div className='flex items-center gap-2 w-12'>
-                    {tags && tags.map(tag =>
-                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>{tag}</p>
-                    )
-                    }
+                    {tags ? typeof tags !== 'string' ? tags?.map(tag =>
+                        <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
+                    ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
+                    : null}
                     {/* // <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer'>+ 1</p> */}
 
                 </div>
@@ -448,11 +449,11 @@ const Home = () => {
     const FilterUI = (setSelectedCategory, setSelectedTag) => {
         return (
             <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
-                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
-
-                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
-
-                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
+                    <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
+              
+                    <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]"/>
+               
+               <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
             </div>
         )
     }
@@ -483,43 +484,38 @@ const Home = () => {
         fetchPosts()
     }, [])
 
-
-
-
-    const { state } = useContext(GlobalContext);
-    const [currentUser, setCurrentUser] = useState(localStorage.getItem('authToken') && state.user)
-    useEffect(() => {
-        if (!currentUser && localStorage.getItem('userId')) {
-            console.log('fetching user')
-            fetchUser(localStorage.getItem('userId'))
-        }
-    }, [])
-
-    const fetchUser = async (id) => {
-        console.log(id)
-        if (!id) return;
-        const requestOptions = {
-            method: 'GET',
-            redirect: 'follow'
-        };
-
-        try {
-
-            const response = await fetch(state.url + `/users/${id}/profile`, requestOptions)
-            const result = await response.json();
-            console.log(result)
-            setCurrentUser(result.user)
-        } catch (err) {
-            console.log(err)
-        }
-    }
-    console.log(localStorage.getItem('userId'))
-    console.log('current user', currentUser)
     
+const { state } = useContext(GlobalContext);
+const [currentUser, setCurrentUser] = useState(
+  localStorage.getItem('authToken') ? state.user : null
+);
+console.log('stateuser:', state.user);
+console.log('initial currentUser:', currentUser);
 
+useEffect(() => {
+  fetchUser(localStorage.getItem('userId'));
+}, []);
 
+const fetchUser = async (id) => {
+  if (!id) return;
 
-    currentUser && console.log(currentUser)
+  const requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+
+  try {
+    const response = await fetch(state.url + `/users/${id}/profile`, requestOptions);
+    const result = await response.json();
+    setCurrentUser(result.user); // ✅ Properly update state
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+console.log('userId:', localStorage.getItem('userId'));
+console.log('current user:', currentUser);
+
 
     return (
         <div>
@@ -545,14 +541,14 @@ const Home = () => {
                         )
                     }
                     {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.profile_image_url || heroImg} /></div>
-                        : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}><User size={18} /></div>
+                        : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{ localStorage.getItem('authToken') ? <Loader size={18}/> : <User size={18} />}</div>
                     }</div>
             </div>
 
             <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full'></div>
                 <p className='text-2xl font-[poppins-bold] text-center leading-snug z-100'><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
-                {currentUser ?
+                {localStorage.getItem('authToken') ?
                     <div className='flex gap-2 items-center'>
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
                     </div>
@@ -567,7 +563,7 @@ const Home = () => {
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
                         <InfoDisplay
                             info={FilterUI}
-
+                            
                             trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
 
                         />
@@ -579,8 +575,8 @@ const Home = () => {
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ?
-                            data.map(element =>
-                                <Post username={element.users.username} profilepic={element?.users?.image_url} readtime='20 mins' date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
+                            data.map((element, i) =>
+                                <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
                             ) :
                             <Loader size={30} />
                         }
