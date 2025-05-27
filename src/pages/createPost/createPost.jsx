@@ -8,18 +8,19 @@ import { toast, Toaster } from 'sonner'
 import Loader from '@/assets/loader/loader';
 
 
-const CreatePost = ({ title, content, tags, category, image, id }) => {
+const CreatePost = ({ title, content, tags, category, image, id, update = false }) => {
     useEffect(() => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth" // remove 'behavior' for instant scroll
-  });
-}, []);
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // remove 'behavior' for instant scroll
+        });
+    }, []);
+
 
     const PostImgRef = useRef(null);
     const [PostImg, setPostImg] = useState(image || null);
     const navigate = useNavigate();
-    const [allTags, setAllTags] = useState(tags || [])
+    const [allTags, setAllTags] = useState(update ? tags : [])
     const [loading, setLoading] = useState(false);
 
     const handleFileUpload = () => {
@@ -43,10 +44,10 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
 
 
     const [formData, setFormData] = useState({
-        title: title || '',
-        content: content || '',
+        title: update ? title : '',
+        content: update ? content : '',
         tag: '',
-        category: category || ''
+        category: update ? category : ''
     });
     const [err, setErr] = useState({
         title: '',
@@ -54,6 +55,20 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
         tag: '',
         category: ''
     })
+
+    useEffect(() => {
+        if (update && title && content && category) {
+            setFormData({
+                title,
+                content,
+                tag: '',
+                category
+            });
+            setAllTags(tags || []);
+            setPostImg(image || null);
+            setImageFile(null); // or set to image if you want
+        }
+    }, [title, content, category, tags, image, update]);
 
 
     const handleChange = (e) => {
@@ -78,7 +93,7 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
         formdata.append("category", formData.category);
         formdata.append("tags", allTags);
         imageFile && formdata.append("image", imageFile, "file")
-        
+
         var myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
 
@@ -129,20 +144,23 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
         formdata.append("tags", allTags);
         imageFile && formdata.append("image", imageFile, "file")
 
-        let requestOptions = {
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+
+        var requestOptions = {
             method: 'PUT',
+            headers: myHeaders,
             body: formdata,
-            redirect: 'follow',
-            credentials: "include"
+            redirect: 'follow'
         };
 
         try {
             setLoading(true)
-            const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
             console.log(result)
             toast.success('Post Edited successfully')
-            // navigate('/')
+            navigate('/')
 
             if (response.ok) setLoading(false)
             else setLoading(false)
@@ -214,15 +232,28 @@ const CreatePost = ({ title, content, tags, category, image, id }) => {
             <div className='flex flex-col gap-4'>
                 <div className='flex gap-4 flex-wrap items-center'>
                     <div>
-                        {allTags && <div className='flex gap-2 items-center flex-wrap'>
-                            {allTags.map((tag, i) => (
-                                <p className='text-[12px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer flex items-center gap-2' key={i}>
-                                    #{tag} <X onClick={() => {
-                                        setAllTags(allTags.filter((_, index) => index !== i))
-                                    }} className='size-6 text-red-500 p-1 rounded-full hover:bg-[#6c5ce760] active:bg-[#6c5ce760]' /></p>
-                            ))}
-                        </div>}
+                        {allTags && (
+                            Array.isArray(allTags)
+                                ? <div className='flex gap-2 items-center flex-wrap'>
+                                    {allTags.map((tag, i) => (
+                                        <p
+                                            className='text-[12px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none flex items-center gap-2'
+                                            key={i}
+                                        >
+                                            #{tag}
+                                            <X
+                                                onClick={() =>
+                                                    setAllTags(allTags.filter((_, index) => index !== i))
+                                                }
+                                                className='size-6 text-red-500 p-1 rounded-full hover:bg-[#6c5ce760] active:bg-[#6c5ce760]'
+                                            />
+                                        </p>
+                                    ))}
+                                </div>
+                                : <p className='text-[12px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none flex items-center gap-2'>#{allTags}</p>
+                        )}
                     </div>
+
                     <div className='w-36 flex gap-1'>
                         <input
                             type='text'

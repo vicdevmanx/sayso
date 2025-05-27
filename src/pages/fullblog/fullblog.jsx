@@ -43,6 +43,62 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
         fetchPost()
     }, [])
 
+ const [allComments, setAllComments] = useState([])
+    const fetchComments = async () => {
+
+
+        const requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
+
+        try {
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
+            const result = await response.json();
+            setAllComments(result)
+
+            console.log('comments', result)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+    const [commentInput, setCommentInput] = useState('')
+    const [commentLoad, setCommentLoad] = useState(false)
+    const addComments = async () => {
+        if (!commentInput) return toast('say something');
+        console.log('commentinggg.... this', commentInput)
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+        myHeaders.append("Content-Type", "application/json");
+
+        const requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify({ content: commentInput }),
+            redirect: 'follow'
+        };
+
+        try {
+            setCommentLoad(true)
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
+            const result = await response.json();
+            toast('Comment added successfully');
+            setCommentInput('');
+            await fetchComments()
+            setCommentLoad(false)
+            console.log('comment added', result)
+        }
+        catch (err) {
+            console.log(err)
+            setCommentLoad(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchComments()
+    }, [])
+
     return (
         <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
             <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
@@ -130,19 +186,27 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                     <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-108', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
 
 
-                        <div className='flex flex-col gap-2 font-[poppins] text-[13px]'>
-                            <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 items-start'>
-                                <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34]'></span>
-                                <p className='leading-snug'>
-                                    <span className='font-[poppins-medium] w-full text-sm'>username</span><br />
-                                    <span>Lorem ipsum dolor sit amet consectetur repellat autem!</span> <br />
-                                    <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                        <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                        <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' /></span>
-                                </p>
+                        {allComments.length > 0 ? allComments.map(comment =>
+                            <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
+                                <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
+                                    <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
+                                        <img src={comment?.users?.profile_image_url} className='object-fit w-full h-auto' loading="lazy" />
+                                    </span>
+                                    <p className='leading-snug'>
+                                        <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
+                                        <span className="w-full">{comment?.content}</span> <br />
+                                        {comment.user_id == localStorage.getItem('userId') ?
+                                            <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
+                                                <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                                <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                            </span>
+                                            : <span></span>
+                                        }
+                                    </p>
 
+                                </div>
                             </div>
-                        </div>
+                        ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium]'>No comments yet</p>}
 
 
                     </div>

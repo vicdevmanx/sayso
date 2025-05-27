@@ -30,7 +30,8 @@ const [data, setData] = useState({})
 
     return(
         <div className='bg-[#0e1117] text-white'>
-        <CreatePost title={data.title} content={data.content} tags={data.tags} category={data.category} image={data.image_url} id={id}/>
+        <CreatePost title={data.title} content={data.content} tags={typeof data.tags === 'string' && data.tags.includes(',')  ? data.tags.split(',') 
+  : data.tags} category={data.category} image={data.image_url} id={id} update={true}/>
         </div>
     )
 }

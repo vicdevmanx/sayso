@@ -48,13 +48,13 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         if (!commentInput) return toast('say something');
         console.log('commentinggg.... this', commentInput)
         const myHeaders = new Headers();
-        myHeaders.append("Authorization",  `Bearer ${localStorage.getItem('authToken')}`);
+        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
         myHeaders.append("Content-Type", "application/json");
 
         const requestOptions = {
             method: 'POST',
             headers: myHeaders,
-            body: JSON.stringify({content: commentInput}),
+            body: JSON.stringify({ content: commentInput }),
             redirect: 'follow'
         };
 
@@ -64,13 +64,13 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
             const result = await response.json();
             toast('Comment added successfully');
             setCommentInput('');
-           await fetchComments()
-           setCommentLoad(false)
+            await fetchComments()
+            setCommentLoad(false)
             console.log('comment added', result)
         }
         catch (err) {
             console.log(err)
-             setCommentLoad(false)
+            setCommentLoad(false)
         }
     }
 
@@ -92,32 +92,32 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                         name="commentInput"
                         value={commentInput}
                         onChange={(e) => setCommentInput(e.target.value)}
-                    /> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div>: <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments}/> }</div>
-        
+                    /> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments} />}</div>
+
                     : <></>
                 }
                 <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
 
                     {allComments.length > 0 ? allComments.map(comment =>
-                    <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
-                        <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
-                            <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
-                                <img src={comment?.users?.profile_image_url} className='object-fit w-full h-auto' loading="lazy" />
-                            </span>
-                            <p className='leading-snug'>
-                                <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
-                                <span className="w-full">{comment?.content}</span> <br />
-                                {comment.user_id == localStorage.getItem('userId') ?
-                                 <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                    <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                    <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                    </span>
-                                    : <span></span>
-                                }
-                            </p>
+                        <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
+                            <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
+                                <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
+                                    <img src={comment?.users?.profile_image_url} className='object-fit w-full h-auto' loading="lazy" />
+                                </span>
+                                <p className='leading-snug'>
+                                    <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
+                                    <span className="w-full">{comment?.content}</span> <br />
+                                    {comment.user_id == localStorage.getItem('userId') ?
+                                        <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
+                                            <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                            <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                        </span>
+                                        : <span></span>
+                                    }
+                                </p>
 
+                            </div>
                         </div>
-                    </div>
                     ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium]'>No comments yet</p>}
 
                 </div>
@@ -129,16 +129,33 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
 
 }
 
-export function More(id) {
+export function More({ id }) {
     const navigate = useNavigate();
     console.log('More id', id)
-    const [activeId, setActiveId] = useState(null);
     return (
         <div className='flex flex-col items-center gap-4 font-[poppins-medium] p-6'>
             <p className='text-white font-[poppins-bold]'>What do you Wanna do?</p>
             <div className='flex gap-2 text-md text-white'>
-                <Button className='flex gap-1 items-center bg-[#272b34]' onClick={() => navigate(`/editPost/${activeId}`)}><Pencil className='size-4' /> <p>Edit Post</p></Button>
-                <Button className='flex gap-1 items-center bg-[#272b34]'><Trash className='text-red-500 size-4' /> <p>Delete Post</p></Button>
+                <Button className='flex gap-1 items-center bg-[#272b34]' onClick={() => navigate(`/editPost/${id}`)}><Pencil className='size-4' /> <p>Edit Post</p></Button>
+                <Button className='flex gap-1 items-center bg-[#272b34]' onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this post?')) {
+                        fetch(`https://sayso-seven.vercel.app/posts/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                toast('Post deleted successfully');
+                                navigate('/');
+                            })
+                            .catch(error => {
+                                console.error('Error deleting post:', error);
+                                toast.error('Failed to delete post');
+                            });
+                    }
+                }}><Trash className='text-red-500 size-4' /> <p>Delete Post</p></Button>
             </div></div>
     );
 
@@ -151,18 +168,18 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
     const [msgOpen, setMsgOpen] = useState(false)
     const navigate = useNavigate();
 
-const [commentInput, setCommentInput] = useState('')
+    const [commentInput, setCommentInput] = useState('')
     const addComments = async () => {
         if (!commentInput) return toast('say something');
         console.log('commentinggg.... this', commentInput)
         const myHeaders = new Headers();
-        myHeaders.append("Authorization",  `Bearer ${localStorage.getItem('authToken')}`);
+        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
         myHeaders.append("Content-Type", "application/json");
 
         const requestOptions = {
             method: 'POST',
             headers: myHeaders,
-            body: JSON.stringify({content: commentInput}),
+            body: JSON.stringify({ content: commentInput }),
             redirect: 'follow'
         };
 
@@ -187,18 +204,18 @@ const [commentInput, setCommentInput] = useState('')
         }} className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
-                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic} loading="lazy" className='object-fit w-full h-auto' /> || <User size={18} />}</div>
+                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic} loading="lazy" className='object-cover h-full' /> || <User size={18} />}</div>
                     <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                         <p className="text-white text-[13px]">{username}</p>
                         <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
                     </div>
                 </div>
                 <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
-                    <InfoDisplay
+                  {myprofile ?  <InfoDisplay
                         info={More}
                         infoProps={{ id }}
                         trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
-                    />
+                    />: <></>}
                 </div>
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
@@ -264,7 +281,7 @@ const [commentInput, setCommentInput] = useState('')
                         name="commentInput"
                         value={commentInput}
                         onChange={(e) => setCommentInput(e.target.value)}
-                    /> <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments}/> </div> : ''
+                    /> <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments} /> </div> : ''
                 }
             </div>
         </div>
@@ -621,7 +638,7 @@ const Home = () => {
                             </Button>
                         )
                     }
-                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.profile_image_url || heroImg} /></div>
+                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto object-cover h-full' src={currentUser.profile_image_url || heroImg} /></div>
                         : <div className='bg-[#1c1f26] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{localStorage.getItem('authToken') ? <Loader size={16} /> : <User size={18} />}</div>
                     }</div>
             </div>
@@ -659,7 +676,9 @@ const Home = () => {
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ?
                             data.map((element, i) =>
-                                <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
+                                <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time}
+                                    date={element.created_at.slice(0, 10)} title={element.title}
+                                    tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
                             ) :
                             Array.from({ length: 6 }).map((_, i) =>
                                 <PostSkeleton key={i} />
