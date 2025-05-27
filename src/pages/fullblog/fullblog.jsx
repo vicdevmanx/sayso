@@ -8,6 +8,7 @@ import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
 import Loader from "@/assets/loader/loader";
+import { toast, Toaster } from "sonner";
 
 const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, likes, comment }) => {
     useEffect(() => {
@@ -33,7 +34,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
             console.log(result)
-            setData(result)
+            setData({...result, tags: typeof result.tags === 'string' ? result.tags.split(',') : result.tags})
         } catch (err) {
             console.log(err)
         }
@@ -43,7 +44,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
         fetchPost()
     }, [])
 
- const [allComments, setAllComments] = useState([])
+    const [allComments, setAllComments] = useState([])
     const fetchComments = async () => {
 
 
@@ -101,6 +102,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
     return (
         <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
+            <Toaster position="top-center" />
             <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
                 <div className='flex justify-between w-full items-center'>
                     <div className='flex flex-col gap-2'>
@@ -125,10 +127,10 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                 </div>
                 <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data?.title || 'loading...'}</h1>
                 <div className='flex gap-2 flex-wrap items-center'>
-                    {data?.tags ? typeof data?.tags !== 'string' ? data?.tags?.map(tag =>
+                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
-                    ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{data?.tags}</p>
-                        : null}
+                    ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
+                        : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>notag</p>}
                 </div>
                 <p className='text-sm'>{data?.content || <Loader size={20} />}</p>
 
@@ -176,13 +178,18 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
                 <div className='flex flex-col gap-2 '>
                     <p className='font-[poppins-bold] text-lg' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
-                    {isMobile ?
-                        <div className=' flex items-center gap-1'> <input
-                            className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
-                            placeholder='Comment'
-                        /> <ArrowRight className='bg-[#272b34] p-3 rounded-xl size-11 w-14' /> </div>
-                        : <></>
-                    }
+
+                    <div className=' flex gap-1 w-screen max-w-120 '> <input
+                        className='bg-[#272b34] rounded-xl w-full max-w-82 py-3 px-4 outline-0 transition text-sm'
+                        placeholder='Say something...'
+                        name="commentInput"
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                    /> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments} />}</div>
+
+
+
+
                     <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-108', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
 
 
@@ -198,7 +205,30 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                                         {comment.user_id == localStorage.getItem('userId') ?
                                             <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
                                                 <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                                <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                                <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' onClick={ async () => {
+                                                    try{
+                                                    var myHeaders = new Headers();
+                                                    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+
+
+                                                    var raw = "null";
+
+                                                    var requestOptions = {
+                                                        method: 'DELETE',
+                                                        headers: myHeaders,
+                                                        body: raw,
+                                                        redirect: 'follow'
+                                                    }
+                                                    const response = await fetch(`https://sayso-seven.vercel.app/posts/comments/${comment.id}`, requestOptions);
+                                                    const result = await response.json();
+                                                    console.log(result);
+                                                    toast('Comment deleted successfully');
+                                                    await fetchComments();
+
+                                                }catch(err){
+                                                        console.log(err)
+                                                    }
+                                                }} />
                                             </span>
                                             : <span></span>
                                         }
@@ -206,7 +236,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
                                 </div>
                             </div>
-                        ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium]'>No comments yet</p>}
+                        ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium] flex w-full justify-center'><Loader size={24} /></p>}
 
 
                     </div>

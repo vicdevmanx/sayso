@@ -195,6 +195,15 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
         }
     }
 
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    toast.success('Link Copied to clipboard!')
+  } catch (err) {
+    toast.error('Failed to copy')
+  }
+}
+
     return (
 
         <div onMouseMove={(e) => {
@@ -219,14 +228,13 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                 </div>
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
-                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white" onClick={() => navigate(`/post/${id}`)}>{title}</h2>
+                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white overflow-hidden" onClick={() => navigate(`/post/${id}`)}>{title?.slice(0, 52)}{title.length >= 52 ? '...': ''}</h2>
                 {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
-                <div className='flex items-center gap-2 w-12'>
+                <div className='flex items-center gap-2 w-full overflow-scroll handleScroll'>
                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
                     ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
-                        : null}
-                    {/* // <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer'>+ 1</p> */}
+                        : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>notag</p>}
 
                 </div>
             </div>
@@ -266,7 +274,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                         />
                     }
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl'>
-                        <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' />
+                        <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' onClick={() => copyToClipboard(`https://sayso-gules.vercel.app/post/${id}`)}/>
                     </div>
                     <p className='bg-white rounded-lg p-1.5 py-1 absolute right-0 text-black text-[13px] items-center gap-1 font-[poppins-medium] readMore' onClick={() => navigate(`/post/${id}`)}> Read
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">

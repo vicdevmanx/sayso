@@ -156,8 +156,8 @@ const Signup = ({ func }) => {
 
                         if (e.target.value.length < 3) {
                             setErr({ ...err, username: 'Username must be at least 3 characters' });
-                        } else if (e.target.value.length > 15) {
-                            setErr({ ...err, username: 'Username must be at most 15 characters' });
+                        } else if (e.target.value.length > 20) {
+                            setErr({ ...err, username: 'Username must be at most 20 characters' });
                         }
                         else {
                             setErr({ ...err, username: '' });

@@ -29,10 +29,12 @@ button {
 
 .handleScroll::-webkit-scrollbar {
     scrollbar-width: thin;
+    height: 3px;
     }
 
 .handleScroll::-webkit-scrollbar-track {
 background: transparent;
+
 }
 
 .handleScroll::-webkit-scrollbar-thumb {
