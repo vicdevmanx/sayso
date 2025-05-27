@@ -7,7 +7,7 @@ import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
 import Drawer from '@mui/material/Drawer';
 import { useState, useRef, useEffect } from 'react'
-import { Toaster } from 'sonner'
+import { Toaster, toast } from 'sonner'
 import imageOne from '../../assets/logo2.jpg'
 import './home.css'
 import InfoDisplay from "../components/trigger";
@@ -21,6 +21,7 @@ import { PostSkeleton } from "../components/postskeleton";
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 700px)');
     const navigate = useNavigate()
+    const [allComments, setAllComments] = useState([])
 
     const fetchComments = async () => {
 
@@ -33,9 +34,34 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         try {
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
             const result = await response.json();
-
+            setAllComments(result)
 
             console.log('comments', result)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+    const [commentInput, setCommentInput] = useState('')
+    const addComments = async () => {
+        if (!commentInput) return toast('say something');
+        console.log('commentinggg.... this', commentInput)
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization",  `Bearer ${localStorage.getItem('authToken')}`);
+        myHeaders.append("Content-Type", "application/json");
+
+        const requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify({content: commentInput}),
+            redirect: 'follow'
+        };
+
+        try {
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
+            const result = await response.json();
+            toast('Comment added successfully')
+            console.log('comment added', result)
         }
         catch (err) {
             console.log(err)
@@ -51,32 +77,41 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                 <Post username={username} profilepic={profilepic} readtime={readtime} date={date} title={title} tags={tags} postImg={postImg} likes={likes} comment={comment} review={true} id={1} content={content.slice(0, 120) + '...'} />
             }
 
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1'>
                 <p className='font-[poppins-bold] text-lg' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
                 {isMobile ?
-                    <div className=' flex items-center gap-1'> <input
+                    <div className=' flex gap-1 w-screen max-w-120 px-2'> <input
                         className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
-                        placeholder='Comment'
-                    /> <ArrowRight className='bg-[#272b34] p-3 rounded-xl size-11 w-14' /> </div>
+                        placeholder='Say something...'
+                        name="commentInput"
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                    /> <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments}/> </div>
                     : <></>
                 }
-                <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
+                <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
 
-
-                    <div className='flex flex-col gap-2 font-[poppins] text-[13px]'>
-                        <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 items-start'>
-                            <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34]'></span>
+                    {allComments.length > 0 ? allComments.map(comment =>
+                    <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
+                        <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
+                            <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
+                                <img src={comment?.users?.profile_image_url} className='object-fit w-full h-auto' loading="lazy" />
+                            </span>
                             <p className='leading-snug'>
-                                <span className='font-[poppins-medium] w-full text-sm'>username</span><br />
-                                <span>Lorem ipsum dolor sit amet consectetur repellat autem!</span> <br />
-                                <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
+                                <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
+                                <span className="w-full">{comment.content}</span> <br />
+                                {comment.user_id == localStorage.getItem('userId') ?
+                                 <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
                                     <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                    <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' /></span>
+                                    <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                    </span>
+                                    : <span></span>
+                                }
                             </p>
 
                         </div>
                     </div>
-
+                    ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium]'>No comments yet</p>}
 
                 </div>
 
@@ -100,7 +135,7 @@ export function More(id) {
 
 }
 
-export const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content }) => {
+export const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content, myprofile = false }) => {
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [liked, setLiked] = useState(false)
     const [dislike, setDisLiked] = useState(false)
@@ -125,13 +160,13 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                         <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
                     </div>
                 </div>
-                <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
+                {myprofile ? <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
                     <InfoDisplay
                         info={More}
                         infoProps={{ id: id }}
                         trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
                     />
-                </div>
+                </div> : <></>}
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white" onClick={() => navigate(`/post/${id}`)}>{title}</h2>
@@ -140,7 +175,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
                     ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
-                    : null}
+                        : null}
                     {/* // <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer'>+ 1</p> */}
 
                 </div>
@@ -203,12 +238,12 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
 const Home = () => {
     const postRef = useRef(null);
 
-  const scrollToPosts = () => {
-    postRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
+    const scrollToPosts = () => {
+        postRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    };
 
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [AuthActive, setAuthActive] = useState(false);
@@ -459,11 +494,11 @@ const Home = () => {
     const FilterUI = (setSelectedCategory, setSelectedTag) => {
         return (
             <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
-                    <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
-              
-                    <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]"/>
-               
-               <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
+                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
+
+                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
+
+                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
             </div>
         )
     }
@@ -494,37 +529,37 @@ const Home = () => {
         fetchPosts()
     }, [])
 
-    
-const { state } = useContext(GlobalContext);
-const [currentUser, setCurrentUser] = useState(
-  localStorage.getItem('authToken') ? state.user : null
-);
-console.log('stateuser:', state.user);
-console.log('initial currentUser:', currentUser);
 
-useEffect(() => {
-  fetchUser(localStorage.getItem('userId'));
-}, []);
+    const { state } = useContext(GlobalContext);
+    const [currentUser, setCurrentUser] = useState(
+        localStorage.getItem('authToken') ? state.user : null
+    );
+    console.log('stateuser:', state.user);
+    console.log('initial currentUser:', currentUser);
 
-const fetchUser = async (id) => {
-  if (!id) return;
+    useEffect(() => {
+        fetchUser(localStorage.getItem('userId'));
+    }, []);
 
-  const requestOptions = {
-    method: 'GET',
-    redirect: 'follow'
-  };
+    const fetchUser = async (id) => {
+        if (!id) return;
 
-  try {
-    const response = await fetch(state.url + `/users/${id}/profile`, requestOptions);
-    const result = await response.json();
-    setCurrentUser(result.user); // ✅ Properly update state
-  } catch (err) {
-    console.log(err);
-  }
-};
+        const requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
 
-console.log('userId:', localStorage.getItem('userId'));
-console.log('current user:', currentUser);
+        try {
+            const response = await fetch(state.url + `/users/${id}/profile`, requestOptions);
+            const result = await response.json();
+            setCurrentUser(result.user); // ✅ Properly update state
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    console.log('userId:', localStorage.getItem('userId'));
+    console.log('current user:', currentUser);
 
 
     return (
@@ -551,7 +586,7 @@ console.log('current user:', currentUser);
                         )
                     }
                     {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto w-10 object-fit' src={currentUser.profile_image_url || heroImg} /></div>
-                        : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{ localStorage.getItem('authToken') ? <Loader size={18}/> : <User size={18} />}</div>
+                        : <div className='bg-[#1c1f26] w-11 h-11 rounded-xl flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{localStorage.getItem('authToken') ? <Loader size={18} /> : <User size={18} />}</div>
                     }</div>
             </div>
 
@@ -559,13 +594,13 @@ console.log('current user:', currentUser);
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full'></div>
                 <p className='text-2xl font-[poppins-bold] text-center leading-snug z-100'><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
                 <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
-                {localStorage.getItem('authToken') ?
-                    <div className='flex gap-2 items-center'>
-                        <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
-                    </div>
-                    : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
+                    {localStorage.getItem('authToken') ?
+                        <div className='flex gap-2 items-center'>
+                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
+                        </div>
+                        : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
                     <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={scrollToPosts}>Explore</Button>
-            </div></div>
+                </div></div>
 
 
             <div className='flex justify-center' ref={postRef}>
@@ -575,7 +610,7 @@ console.log('current user:', currentUser);
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
                         <InfoDisplay
                             info={FilterUI}
-                            
+
                             trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
 
                         />

@@ -77,7 +77,7 @@ const Profile = () => {
                 <h3 className="text-xl font-[poppins-bold] mb-4">Recent Posts</h3>
                 <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                     {posts ? posts.map(element =>
-                        <Post username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
+                        <Post username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true}/>
                     ) :
                         <Loader size={30} />
                     }
