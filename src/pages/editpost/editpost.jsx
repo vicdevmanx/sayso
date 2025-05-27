@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 
 const EditPost = () => {
 const { id } = useParams();
-
+console.log(id)
 
 const [data, setData] = useState({})
- const fetchPost = async () => {
+   const fetchPost = async () => {
         try {
             var requestOptions = {
                 method: 'GET',
                 redirect: 'follow'
             };
 
-            const response = await fetch(`https://sayso-seven.vercel.app/api/posts/${id}`, requestOptions);
+            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
             console.log(result)
             setData(result)
@@ -25,7 +25,7 @@ const [data, setData] = useState({})
 
     useEffect(() => {
         fetchPost()
-    },[])
+    }, [])
 
 
     return(

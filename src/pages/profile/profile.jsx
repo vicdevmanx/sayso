@@ -7,13 +7,15 @@ import { useContext } from "react";
 import { GlobalContext } from "@/components/functional/context"; // ✅ Import context
 import Loader from "@/assets/loader/loader";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import { PostSkeleton } from "../components/postskeleton";
 
 const Profile = () => {
-        useEffect(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth" // remove 'behavior' for instant scroll
-      });
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth" // remove 'behavior' for instant scroll
+        });
     }, []);
     const [file, setFile] = useState(null)
     const [currentUser, setCurrentUser] = useState(null);
@@ -23,7 +25,7 @@ const Profile = () => {
         fetchUser(localStorage.getItem('userId'));
     }, []);
 
-    const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState(null);
     const fetchUser = async (id) => {
         if (!id) return;
 
@@ -36,7 +38,8 @@ const Profile = () => {
             const response = await fetch(state.url + `/users/${id}/profile`, requestOptions);
             const result = await response.json();
             setCurrentUser(result.user); // ✅ Properly update state
-            setPosts(result.posts); // ✅ Set posts from the fetched user data
+            setPosts(result.posts);
+            console.log(result) // ✅ Set posts from the fetched user data
         } catch (err) {
             console.log(err);
         }
@@ -55,11 +58,11 @@ const Profile = () => {
                     />
                 </div>
                     : <div className="relative w-24 h-24 rounded-full mb-2 bg-[#272b34] flex justify-center items-center">
-                        <User className="size-8" />
+                        <Loader size={24} />
                     </div>
                 }
-                <h2 className="text-lg font-[poppins-medium] text-white">{currentUser?.username || <Loader size={16} />}</h2>
-                <p className="text-white text-center mt-2 text-sm font-[poppins]">{currentUser?.bio || null}
+                <h2 className="text-lg font-[poppins-medium] text-white">{currentUser?.username || <Skeleton width={100} height={15} baseColor="#2c2f36" highlightColor="#3a3e48" />}</h2>
+                <p className="text-white text-center mt-1 text-sm font-[poppins]">{currentUser?.bio || <Skeleton width={200} height={15} baseColor="#2c2f36" highlightColor="#3a3e48" />}
                 </p>
             </div>
 
@@ -77,9 +80,11 @@ const Profile = () => {
                 <h3 className="text-xl font-[poppins-bold] mb-4">Recent Posts</h3>
                 <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                     {posts ? posts.map(element =>
-                        <Post username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true}/>
+                        <Post username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true} />
                     ) :
-                        <Loader size={30} />
+                        Array.from({ length: 6 }).map((_, i) =>
+                            <PostSkeleton key={i} />
+                        )
                     }
                 </div>
             </div>

@@ -47,11 +47,17 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
         <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
             <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
                 <div className='flex justify-between w-full items-center'>
-                    <div className='flex gap-2 items-center'>
-                        <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' /><div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={data?.users?.profile_image_url} className='object-fit w-full h-auto' /> || <User size={18} />}</div>
-                        <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
-                            <p className="text-white text-[13px]">{data?.users?.username || 'Loading...'}</p>
-                            <p className='flex items-center gap-1.5 text-xs'>{data?.created_at?.slice(0, 10) || 'Loading'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {data?.read_time || 'loading...'} read </p>
+                    <div className='flex flex-col gap-2'>
+                        <div className='flex items-center gap-2'>
+                            <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' />
+                            <p className='text-white text-xl font-[poppins-bold]'>Post</p>
+                        </div>
+                        <div className='flex gap-2 items-center'>
+                            <div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={data?.users?.profile_image_url} className='object-fit w-full h-auto' /> || <User size={18} />}</div>
+                            <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
+                                <p className="text-white text-[13px]">{data?.users?.username || 'Loading...'}</p>
+                                <p className='flex items-center gap-1.5 text-xs'>{data?.created_at?.slice(0, 10) || 'Loading'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {data?.read_time || 'loading...'} read </p>
+                            </div>
                         </div>
                     </div>
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
