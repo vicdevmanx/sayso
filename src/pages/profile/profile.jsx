@@ -1,4 +1,4 @@
-import { Pencil, Plus, User } from "lucide-react";
+import { Pencil, Plus, SearchSlash, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Post } from "../home/home";
 import clsx from 'clsx';
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import { PostSkeleton } from "../components/postskeleton";
 import { toast, Toaster } from "sonner";
+import defaultProfile from "@/assets/default.webp"; // Import default profile image
 
 const Profile = () => {
     useEffect(() => {
@@ -44,8 +45,8 @@ const Profile = () => {
         }
     };
     const [form, setForm] = useState({
-        username:  '' || currentUser?.username,
-        bio: '' || currentUser?.username
+        username:  '',
+        bio: ''
     })
 
     const handleChange = (e) => {
@@ -83,13 +84,13 @@ const Profile = () => {
 
     const [updating, setUpdating] = useState(false);
     const handleUpdateProfile = async () => {
-        if (!form.username || !form.email || !form.bio || !mainPicFile) {
-            toast.error('Please fill in all fields and upload a profile picture.');
+        if (!form.username || !form.bio) {
+            toast.error('Please fill in all fields')
+            return;
         }
         var myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
 
-console.log(localStorage.getItem('authToken'))
         var formdata = new FormData();
         formdata.append("username", form.username);
         // formdata.append("email", "new@example.com");
@@ -107,19 +108,20 @@ console.log(localStorage.getItem('authToken'))
             setUpdating(true)
             const response = await fetch(state.url + `/users/me`, requestOptions);
                 const result = await response.json();
-                console.log(result);
-                toast.success('Profile updated successfully!');
+                
+                 window.location.reload();
+                  toast.success('Profile updated successfully!');
                 setEditMode(false);
                 setUpdating(false)
-                window.location.reload();
-                setCurrentUser(result.user);
-                setPosts(result.posts);
+                // setCurrentUser(result.user);
+                // setPosts(result.posts);
                 setProfileImg(null); // Reset profile image after update
                 setMainPicFile(null); // Reset main picture file after update
                 setForm({
                     username: null,
                     bio: null
                 });
+                 
             }
          catch(error) {
             console.log(error);
@@ -129,14 +131,14 @@ console.log(localStorage.getItem('authToken'))
     }
 
     return (
-        <div className="min-h-screen flex flex-col m-auto items-center max-w-3xl w-full p-2 px-0">
+        <div className="min-h-screen flex flex-col m-auto items-center max-w-4xl w-full p-2 px-0">
             <Toaster position="top-center" closeButton={false} />
             {editMode ?
                 <div className="flex flex-col items-center my-2">
 
-                    {currentUser?.profile_image_url || profileImg ? <div className='relative'><div className="w-24 h-24 rounded-full mb-2 bg-[#272b34] relative overflow-hidden flex items-center justify-center">
+                    {currentUser?.profile_image_url || defaultProfile || profileImg ? <div className='relative'><div className="w-24 h-24 rounded-full mb-2 bg-[#272b34] relative overflow-hidden flex items-center justify-center">
                         <img
-                            src={profileImg || currentUser?.profile_image_url}
+                            src={profileImg || currentUser?.profile_image_url || defaultProfile}
                             alt="Profile Avatar"
                             className=" object-cover h-full"
                         />
@@ -157,14 +159,23 @@ console.log(localStorage.getItem('authToken'))
                             <Loader size={24} />
                         </div>
                     }
-                    <input className="text-lg font-[poppins-medium] text-white border p-2 rounded-lg py-1 border-[#2c2f36]" value={form.username} name='username' onChange={handleChange} placeholder="Enter username" />
-                    <input className="text-white mt-2 text-md font-[poppins] border p-2 rounded-lg py-1 border-[#2c2f36] w-82" value={form.bio} name='bio' onChange={handleChange} placeholder="Enter bio" />
+                    <input className="text-md font-[poppins-medium] text-white border p-2 rounded-lg py-1 border-[#2c2f36]" value={form.username} name='username' onChange={handleChange} placeholder="Enter username" />
+                    <input className="text-white mt-2 text-sm font-[poppins] border p-2 rounded-lg border-[#2c2f36] w-82" value={form.bio} name='bio' onChange={handleChange} placeholder="Enter bio" />
                 </div>
-                : <div className="flex flex-col items-center my-2">
 
-                    {currentUser?.profile_image_url ? <div className="w-24 h-24 rounded-full mb-2 bg-[#272b34] relative overflow-hidden flex items-center justify-center">
+
+
+
+                : 
+                
+                
+                
+                
+                <div className="flex flex-col items-center my-2">
+
+                    {currentUser?.profile_image_url || defaultProfile ? <div className="w-24 h-24 rounded-full mb-2 bg-[#272b34] relative overflow-hidden flex items-center justify-center">
                         <img
-                            src={currentUser?.profile_image_url}
+                            src={currentUser?.profile_image_url || defaultProfile}
                             alt="Profile Avatar"
                             className="object-cover h-full"
                         />
@@ -183,8 +194,13 @@ console.log(localStorage.getItem('authToken'))
                     if (editMode) {
                         // If in edit mode, save changes
                         handleUpdateProfile();
+                       
                     } else {
                         // If not in edit mode, toggle to edit mode
+                        setForm({
+                            username: currentUser?.username || '',
+                            bio: currentUser?.bio || ''
+                        });
                         setEditMode(!editMode)
                     }
                 }
@@ -192,6 +208,7 @@ console.log(localStorage.getItem('authToken'))
                 <Button className='bg-red-400' onClick={() => {
                     localStorage.removeItem('authToken')
                     localStorage.removeItem('userId')
+                    toast('Logging out...')
                     navigate('/')
                     window.location.reload();
                 }}>Logout</Button>
@@ -200,7 +217,12 @@ console.log(localStorage.getItem('authToken'))
             <div className="mt-4 p-4  w-full flex flex-col items-center">
                 <h3 className="text-xl font-[poppins-bold] mb-4">Recent Posts</h3>
                 <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
-                    {posts ? posts.map((element, i) =>
+                    {posts ? posts.length <= 0 ?
+                    <div className='flex flex-col items-center justify-center gap-4 bg-[#272b34] p-6 rounded-lg w-[18rem]'>
+                        <SearchSlash className='size-8 text-[#6c5ce7]' />
+                        <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
+                        <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' onClick={() => navigate('/createpost')}>Create Your First Post</Button>
+                        </div> : posts.map((element, i) =>
                         <Post key={i} username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true} />
                     ) :
                         Array.from({ length: 6 }).map((_, i) =>

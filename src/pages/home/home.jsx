@@ -1,4 +1,4 @@
-import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight, ArrowDown, ArrowUp } from "lucide-react";
+import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight, ArrowDown, ArrowUp, SearchSlash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import sayso from '../../assets/sayso assets/sayso.png'
 import clsx from 'clsx'
@@ -17,6 +17,8 @@ import Loader from "@/assets/loader/loader";
 import { useContext } from "react";
 import { GlobalContext } from "@/components/functional/context";
 import { PostSkeleton } from "../components/postskeleton";
+import defaultProfile from '../../assets/default.webp'
+import CommentSkeleton from "../components/commentSkeleton";
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 720px)');
@@ -34,7 +36,10 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         try {
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
             const result = await response.json();
-            setAllComments(result)
+            
+            if(result.length === 0) {
+                setAllComments([{ content: 'No comments yet', info: 'Be the first to comment', users: { username: 'SaySo' } }])
+            }else setAllComments(result)
         }
         catch (err) {
             console.log(err)
@@ -95,28 +100,28 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
 
                 <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-90', 'overflow-scroll', 'h-100', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
 
-                    {allComments.length > 0 ? allComments.map(comment =>
-                        <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
+                    {allComments.length > 0 ? allComments.map((comment, i) =>
+                        <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full' key={i}>
                             <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
-                                <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
-                                    <img src={comment?.users?.profile_image_url} className='object-fit w-full h-auto' loading="lazy" />
-                                </span>
+                              {!comment.info && <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
+                                    <img src={comment?.users?.profile_image_url || defaultProfile} className='object-cover h-full' loading="lazy" />
+                                </span>}
                                 <p className='leading-snug'>
-                                    <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
-                                    <span className="w-full">{comment?.content}</span> <br />
+                                    {!comment.info && <><span className='font-[poppins-medium] w-full text-xs'>{comment?.users?.username}</span><br /></>}
+                                    <span className="w-full text-sm">{comment?.content}</span> <br />
                                     {comment.user_id == localStorage.getItem('userId') ?
                                         // <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
                                         //     <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
                                         //     <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
                                         // </span>
-                                        <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
-                                        : <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                                        <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
+                                        :  <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
                                     }
                                 </p>
 
                             </div>
                         </div>
-                    ) : <Loader size={24} />}
+                    ) : <CommentSkeleton/>}
 
                 </div>
 
@@ -179,7 +184,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
         <div className={clsx('bg-[#1c1f26]', review ? 'border-[0px]' : 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
-                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic} loading="lazy" className='object-cover h-full' /> || <User size={18} />}</div>
+                    <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic || defaultProfile} loading="lazy" className='object-cover h-full' /> || <User size={18} />}</div>
                     <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                         <p className="text-white text-[13px]">{username}</p>
                         <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
@@ -535,6 +540,8 @@ const Home = () => {
 
     const [SelectedTag, setSelectedTag] = useState(null)
     const [SelectedCategory, setSelectedCategory] = useState(null)
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [postsExists, setPostsExists] = useState(true);
     const fetchPosts = async (filter = '') => {
 
         var requestOptions = {
@@ -544,10 +551,14 @@ const Home = () => {
 
         try {
             const response = await fetch("https://sayso-seven.vercel.app/posts", requestOptions);
-
             const result = await response.json();
             filter && setData(result.filter(post => post.tags.includes(filter) || post.category === filter || post.title.toLowerCase().includes(filter.toLowerCase())))
             !filter && setData(result)
+            if (data.length === 0 || result.length === 0 || data === undefined || data === null) {
+                setPostsExists(false);
+            } else {
+                setPostsExists(true);
+            }
 
         } catch (err) {
             console.log(err)
@@ -587,33 +598,58 @@ const Home = () => {
 
     const FilterUI = (setSelectedCategory, setSelectedTag) => {
         return (
-            <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
-                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
+            <div className="flex flex-col gap-4 text-white font-[poppins] p-4 w-screen max-w-md bg-[#1c1f26] rounded-xl">
+                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34] w-full" />
 
-                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#88a7ef]" />
+                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#88a7ef] w-full" />
 
-                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
+                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec] py-6'> Filter</Button>
             </div>
         )
     }
     return (
         <div>
-            <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000'>
+            <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000 h-16'>
                 <h1 className='font-[poppins-bold] text-xl select-none'><img src={sayso} alt='saysologo' className='w-24' /></h1>
                 <div className='flex gap-2 items-center'>
                     {
                         isFocused && (
+                            <div className={`${isMobile ? 'right-2' : 'right-14'} absolute InputAni min-lg:InputAni2 max-w-xl`}>
                             <input
                                 ref={inputRef}
                                 onBlur={() => setIsFocused(false)}
                                 type='search'
                                 placeholder='Search Posts...'
-                                className='absolute text-xs bg-[#262a35] rounded-xl p-4 pl-4 outline-0 InputAni min-lg:InputAni2 right-2 max-w-xl h-11'
+                                className={` text-sm bg-[#262a35] rounded-xl p-3 pl-4 outline-0 w-full`}
                                 onInput={async (e) => {
                                     const filter = e.target.value;
-                                    await fetchPosts(filter);
+                                    scrollToPosts()
+                                    setSearchLoading(true);
+                                    await fetchPosts(filter).then(() => {
+                                        setSearchLoading(false)
+                                        if (data.length === 0 || data === undefined || data === null) {
+                                            toast(`No posts for ${filter} not found`, {
+                                                position: "top-center",
+                                                autoClose: 5000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: true,
+                                                progress: undefined,
+                                            });
+                                            setPostsExists(false);
+                                        }else {
+                                            setPostsExists(true);
+                                        }
+                                    });
                                 }}
                             />
+                            {searchLoading && (
+                                <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+                                    <Loader size={24} />
+                                </div>
+                            )}
+                            </div>
 
                         )
                     }
@@ -625,24 +661,30 @@ const Home = () => {
                             </Button>
                         )
                     }
-                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto object-cover h-full' src={currentUser.profile_image_url || heroImg} /></div>
+                    {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto object-cover h-full' src={currentUser.profile_image_url || defaultProfile} /></div>
                         : <div className='bg-[#1c1f26] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{localStorage.getItem('authToken') ? <Loader size={16} /> : <User size={18} />}</div>
                     }</div>
             </div>
 
             <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" ref={heroRef} style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full' ></div>
-                <p className={clsx(isMobile ? 'text-2xl' : 'text-3xl', '-mt-8', 'font-[poppins-bold] text-center leading-snug z-100')}><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
+                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100')}><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
                 <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
                     {localStorage.getItem('authToken') ?
                         <div className='flex gap-2 items-center'>
                             <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
+                            <Button className='bg-red-400' onClick={() => {
+                                                localStorage.removeItem('authToken')
+                                                localStorage.removeItem('userId')
+                                                toast('Logging out...')
+                                                window.location.reload();
+                                            }}>Logout</Button>
                         </div>
                         : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
                 </div></div>
             <Button
                 className={`${onHero ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'bg-[#272b34]'}
-                     w-16 h-16 z-100 fixed bottom-4 right-4 rounded-full flex items-center justify-center transition-all duration-300 ${onHero ? 'pulse-ring' : ''
+                     w-14 h-14 z-20 fixed bottom-8 right-4 rounded-full flex items-center justify-center transition-all duration-300 ${onHero ? 'pulse-ring' : ''
                     } `}
                 onClick={onHero ? scrollToPosts : scrollToHero}
             >
@@ -674,9 +716,12 @@ const Home = () => {
                                     date={element.created_at.slice(0, 10)} title={element.title}
                                     tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
                             ) :
-                            Array.from({ length: 6 }).map((_, i) =>
+                            postsExists ? Array.from({ length: 6 }).map((_, i) =>
                                 <PostSkeleton key={i} />
-                            )
+                            ) : <div className='flex flex-col items-center justify-center gap-4 w-full h-full'>
+                                <SearchSlash className='size-64 text-[#717889]' />
+                                <h1 className='text-white font-[poppins-bold] text-2xl'>No Posts Found!</h1>
+                            </div>
                         }
                     </div>
 

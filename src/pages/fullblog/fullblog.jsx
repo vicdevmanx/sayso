@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
 import Loader from "@/assets/loader/loader";
 import { toast, Toaster } from "sonner";
+import BlogSkeleton from "../components/blogskeleton";
+import defaultProfile from '@/assets/default.webp'
 
 const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, likes, comment }) => {
     useEffect(() => {
@@ -22,7 +24,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
     const isMobile = useMediaQuery('(max-width: 700px)');
     const navigate = useNavigate()
     const { id } = useParams()
-    const [data, setData] = useState({})
+    const [data, setData] = useState(null)
 
     const fetchPost = async () => {
         try {
@@ -54,8 +56,10 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
         try {
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
-            const result = await response.json();
-            setAllComments(result)
+            const result = await response.json()
+              if(result.length === 0) {
+                setAllComments([{ content: 'No comments yet', info: 'Be the first to comment', users: { username: 'SaySo' } }])
+            }else setAllComments(result)
         }
         catch (err) {
             console.log(err)
@@ -107,9 +111,10 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
     }, [])
 
     return (
-        <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
+        <>{data ? 
+            <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
             <Toaster position="top-center" />
-            <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-2xl gap-4">
+            <div className="min-h-screen flex flex-col m-auto p-2 py-4 w-full max-w-4xl gap-4">
                 <div className='flex justify-between w-full items-center'>
                     <div className='flex flex-col gap-2'>
                         <div className='flex items-center gap-2'>
@@ -117,20 +122,21 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                             <p className='text-white text-xl font-[poppins-bold]'>Post</p>
                         </div>
                         <div className='flex gap-2 items-center'>
-                            <div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={data?.users?.profile_image_url} className='object-fit w-full h-auto' /> || <User size={18} />}</div>
+                            <div className='bg-[#272b34] w-12 h-12 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={data?.users?.profile_image_url || defaultProfile} className='object-cover h-full' /> || <User size={18} />}</div>
                             <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                                 <p className="text-white text-[13px]">{data?.users?.username || 'Loading...'}</p>
                                 <p className='flex items-center gap-1.5 text-xs'>{data?.created_at?.slice(0, 10) || 'Loading'}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {data?.read_time || 'loading...'} read </p>
                             </div>
                         </div>
                     </div>
-                    <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
+                    {localStorage.getItem('userId') && localStorage.getItem('userId') == data?.users?.id && <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
                         <InfoDisplay
                             info={More}
                             infoProps={{ id }}
                             trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
                         />
-                    </div>
+                        </div>}
+                    
                 </div>
                 <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data?.title || 'loading...'}</h1>
                 <div className='flex gap-2 flex-wrap items-center'>
@@ -186,7 +192,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                 <div className='flex flex-col gap-2 '>
                     <p className='font-[poppins-bold] text-lg' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
 
-                     <div className={clsx(' flex gap-1 w-screen flex-col items-end relative', isMobile ? 'max-w-120' : 'max-w-88')}> <textarea
+                     <div className={clsx(' flex gap-1 w-full flex-col items-end relative', isMobile ? 'max-w-120' : 'w-full')}> <textarea
                     className='bg-[#1c1f26] rounded-xl w-full py-3 px-4 outline-0 transition text-sm pr-28 handleScroll'
                     placeholder='Say something...'
                     name="commentInput"
@@ -197,17 +203,17 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
 
 
-                    <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-108', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
+                    <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-full', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12')}>
 
 
                         {allComments.length > 0 ? allComments.map(comment =>
                             <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
                                 <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
-                                    <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
-                                        <img src={comment?.users?.profile_image_url} className='object-fit w-full h-auto' loading="lazy" />
-                                    </span>
+                                   {!comment.info && <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
+                                        <img src={comment?.users?.profile_image_url || defaultProfile} className='object-cover h-full' loading="lazy" />
+                                    </span>}
                                     <p className='leading-snug'>
-                                        <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
+                                        {!comment.info && <><span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br /></>}
                                         <span className="w-full">{comment?.content}</span> <br />
                                         {comment.user_id == localStorage.getItem('userId') ?
                                             // <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
@@ -237,8 +243,8 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                                             //         }
                                             //     }} />
                                             // </span>
-                                            <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
-                                            : <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                                            <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
+                                            : <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
                                         }
                                     </p>
 
@@ -252,7 +258,8 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                 </div>
 
             </div>
-        </div>
+        </div>:
+        <BlogSkeleton />}</>
     )
 }
 

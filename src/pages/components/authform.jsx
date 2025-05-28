@@ -288,6 +288,14 @@ const Login = ({ func }) => {
                 body: JSON.stringify(formData)
             });
             const result = await response.json()
+            console.log('result')
+            if (result.error) {
+                toast.error('Invalid Credentials');
+                console.log(result.error);
+                setLoading(false);
+                return;
+            }
+            
             setLoading(false);
             toast.success('Successfully logged in');
             localStorage.setItem('authToken', result.token)
@@ -304,7 +312,6 @@ const Login = ({ func }) => {
         catch (err) {
             console.log(err)
             setLoading(false);
-            toast.error('error');
         }
     }
 

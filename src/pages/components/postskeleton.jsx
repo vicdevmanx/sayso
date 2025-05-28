@@ -32,7 +32,7 @@ export const PostSkeleton = ({ review = false }) => {
             </div>
 
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
-                <Skeleton width="90%" height={20} baseColor="#2c2f36" highlightColor="#3a3e48" />
+                <Skeleton width="90%" height={40} baseColor="#2c2f36" highlightColor="#3a3e48" />
                 {review && <Skeleton width="100%" height={40} baseColor="#2c2f36" highlightColor="#3a3e48" />}
                 <div className='flex gap-2'>
                     {[1, 2, 3].map((_, i) => (

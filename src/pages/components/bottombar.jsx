@@ -18,14 +18,14 @@ const BottomBar = () => {
                 </NavLink>
                 <NavLink to={localStorage.getItem('authToken') ? "/createpost" : '/'}>
                 {({isActive}) => (
-                <div onClick={() => localStorage.getItem('authToken')  ? null : toast('To Create a Post your gonna have to signup or Login')}  className={clsx('p-2', 'rounded-full',  'transition', isActive && localStorage.getItem('authToken') ? 'text-white' : 'text-[#717889]', isActive && localStorage.getItem('authToken') ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive && localStorage.getItem('authToken') ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
+                <div onClick={() => localStorage.getItem('authToken')  ? null : toast('Signup or Login to Create Post')}  className={clsx('p-2', 'rounded-full',  'transition', isActive && localStorage.getItem('authToken') ? 'text-white' : 'text-[#717889]', isActive && localStorage.getItem('authToken') ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive && localStorage.getItem('authToken') ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
                     <Plus/>
                     </div>
                 )}
                 </NavLink>
                 <NavLink to={localStorage.getItem('authToken') ? "/profile" : '/'}>
                 {({isActive}) => (
-                <div onClick={() => localStorage.getItem('authToken')  ? null : toast('To visit Profile your gonna have to signup or Login')} className={clsx('p-2', 'rounded-full',  'transition', isActive && localStorage.getItem('authToken') ? 'text-white' : 'text-[#717889]', isActive && localStorage.getItem('authToken') ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive && localStorage.getItem('authToken') ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
+                <div onClick={() => localStorage.getItem('authToken')  ? null : toast('Signup or Login to visit profile')} className={clsx('p-2', 'rounded-full',  'transition', isActive && localStorage.getItem('authToken') ? 'text-white' : 'text-[#717889]', isActive && localStorage.getItem('authToken') ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' :  'bg-transparent', isActive && localStorage.getItem('authToken') ? 'hover:bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'hover:bg-[#272b34]')}>
                     <User/>
                     </div>
                 )}

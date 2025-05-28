@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Plus, X } from 'lucide-react';
+import { Camera, Edit, Plus, Trash2, X } from 'lucide-react';
 import { User, MoreHorizontal, ThumbsUp, ThumbsDown, MessageCircleMore, Share, ArrowRight, Pencil, Trash, ChevronLeft } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -28,8 +28,19 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
     };
 
     const [imageFile, setImageFile] = useState(image || null)
+    const MAX_IMAGE_SIZE_MB = 3; // Maximum image size in MB
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
+        
+        if (file) {
+        const sizeInMB = file.size / (1024 * 1024);
+        if (sizeInMB > MAX_IMAGE_SIZE_MB) {
+            toast.error(`Image too large. Max size is ${MAX_IMAGE_SIZE_MB}MB`);
+            return;
+        }
+    }
+
+
         setImageFile(file)
 
         if (file) {
@@ -185,7 +196,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
     // </div>
 
     return (
-        <div className="min-h-screen flex flex-col m-auto px-2 pb-20 w-full max-w-2xl gap-4">
+        <div className="min-h-screen flex flex-col m-auto px-2 pb-20 w-full max-w-4xl gap-4">
             <Toaster position='top-center' />
             <div className='flex w-full items-center justify-between'>
                 <div className='flex gap-2 items-center '>
@@ -319,13 +330,9 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                     onChange={handleChange}
                     onInput={
                         (e) => {
-                            if (e.target.value.length >= 6500) {
-                                e.target.value = e.target.value.slice(0, 6500)
-                                toast.error('Content should not be more than 6500 characters')
-                            }
                             setErr({
                                 ...err,
-                                content: `${e.target.value.length}/6500`
+                                content: `${e.target.value.length} letters`
                             })
                         }
                     }
@@ -341,15 +348,23 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                     className="hidden"
                     onChange={handleFileChange}
                 />
-                <div className="w-full h-auto min-h-30 rounded-md flex justify-center items-center overflow-hidden" onClick={handleFileUpload}>
-                    {PostImg ? <img src={PostImg} /> : <div className='flex flex-col gap-1 items-center'><Camera className="size-10" /> <p>Add Image</p></div>}
+                <div className="w-full h-auto min-h-36 rounded-md flex justify-center items-center overflow-hidden relative" onClick={!PostImg && handleFileUpload}>
+                    {PostImg && <div className='absolute top-2 right-2 p-1 cursor-pointer flex gap-2 items-center'>
+                        <span className='w-10 h-10 bg-[#272b34] rounded-full flex items-center justify-center' onClick={handleFileUpload}><Pencil className='size-6'/></span>
+                         <span className='w-10 h-10 bg-[#272b34] rounded-full flex items-center justify-center' onClick={() => {
+                            setPostImg(null);
+                            setImageFile(null);
+                         }}><Trash2 className='size-6 stroke-red-500'/></span>
+                    </div>}
+                    {PostImg ? <img src={PostImg} />
+                    : <div className='flex flex-col gap-1 items-center'><Camera className="size-10" /> <p>Add Image</p><p>Max image size is {MAX_IMAGE_SIZE_MB}MB</p></div>}
                 </div>
             </div>
 
             <button
                 type='submit'
                 disable={loading}
-                className='p-3 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
+                className='p-4 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
                 onClick={() => {
                     title ? handleEditSubmit() : handlePostSubmit()
 
