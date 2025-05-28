@@ -33,8 +33,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
-            console.log(result)
-            setData({...result, tags: typeof result.tags === 'string' ? result.tags.split(',') : result.tags})
+            setData({ ...result, tags: typeof result.tags === 'string' ? result.tags.split(',') : result.tags })
         } catch (err) {
             console.log(err)
         }
@@ -57,8 +56,6 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
             const result = await response.json();
             setAllComments(result)
-
-            console.log('comments', result)
         }
         catch (err) {
             console.log(err)
@@ -68,7 +65,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
     const [commentLoad, setCommentLoad] = useState(false)
     const addComments = async () => {
         if (!commentInput) return toast('say something');
-        console.log('commentinggg.... this', commentInput)
+        if(!localStorage.getItem('authToken')) return toast('Please login to comment');
         const myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
         myHeaders.append("Content-Type", "application/json");
@@ -88,13 +85,22 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
             setCommentInput('');
             await fetchComments()
             setCommentLoad(false)
-            console.log('comment added', result)
         }
         catch (err) {
             console.log(err)
             setCommentLoad(false)
         }
     }
+
+
+    const copyToClipboard = async (text) => {
+            try {
+                await navigator.clipboard.writeText(text)
+                toast.success('Link Copied to clipboard!')
+            } catch (err) {
+                toast.error('Failed to copy')
+            }
+        }
 
     useEffect(() => {
         fetchComments()
@@ -121,13 +127,14 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
                         <InfoDisplay
                             info={More}
+                            infoProps={{ id }}
                             trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
                         />
                     </div>
                 </div>
                 <h1 className="text-2xl font-[poppins-bold] text-white mb-4">{data?.title || 'loading...'}</h1>
                 <div className='flex gap-2 flex-wrap items-center'>
-                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
+                    {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
                     ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
                         : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>notag</p>}
@@ -166,7 +173,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                     </div>
 
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl'>
-                        <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' />
+                        <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' onClick={() => copyToClipboard(`https://sayso-gules.vercel.app/post/${id}`)}/>
                     </div>
                     <p className='bg-white rounded-lg p-1.5 py-1 absolute right-0 text-black text-[13px] items-center gap-1 font-[poppins-medium] readMore'> Read
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
@@ -179,13 +186,13 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                 <div className='flex flex-col gap-2 '>
                     <p className='font-[poppins-bold] text-lg' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
 
-                    <div className=' flex gap-1 w-screen max-w-120 '> <input
-                        className='bg-[#272b34] rounded-xl w-full max-w-82 py-3 px-4 outline-0 transition text-sm'
-                        placeholder='Say something...'
-                        name="commentInput"
-                        value={commentInput}
-                        onChange={(e) => setCommentInput(e.target.value)}
-                    /> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments} />}</div>
+                     <div className={clsx(' flex gap-1 w-screen flex-col items-end relative', isMobile ? 'max-w-120' : 'max-w-88')}> <textarea
+                    className='bg-[#1c1f26] rounded-xl w-full py-3 px-4 outline-0 transition text-sm pr-28 handleScroll'
+                    placeholder='Say something...'
+                    name="commentInput"
+                    value={commentInput}
+                    onChange={(e) => setCommentInput(e.target.value)}
+                /><div className="absolute bottom-2 right-2"> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-2 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-2 rounded-xl text-xs' : 'bg-[#272b34] px-4 py-2 rounded-xl text-xs'} onClick={addComments} >Comment</Button>}</div> </div>
 
 
 
@@ -203,34 +210,35 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                                         <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
                                         <span className="w-full">{comment?.content}</span> <br />
                                         {comment.user_id == localStorage.getItem('userId') ?
-                                            <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                                <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                                <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' onClick={ async () => {
-                                                    try{
-                                                    var myHeaders = new Headers();
-                                                    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+                                            // <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
+                                            //     <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                            //     <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' onClick={async () => {
+                                            //         try {
+                                            //             var myHeaders = new Headers();
+                                            //             myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
 
 
-                                                    var raw = "null";
+                                            //             var raw = "null";
 
-                                                    var requestOptions = {
-                                                        method: 'DELETE',
-                                                        headers: myHeaders,
-                                                        body: raw,
-                                                        redirect: 'follow'
-                                                    }
-                                                    const response = await fetch(`https://sayso-seven.vercel.app/posts/comments/${comment.id}`, requestOptions);
-                                                    const result = await response.json();
-                                                    console.log(result);
-                                                    toast('Comment deleted successfully');
-                                                    await fetchComments();
+                                            //             var requestOptions = {
+                                            //                 method: 'DELETE',
+                                            //                 headers: myHeaders,
+                                            //                 body: raw,
+                                            //                 redirect: 'follow'
+                                            //             }
+                                            //             const response = await fetch(`https://sayso-seven.vercel.app/posts/comments/${comment.id}`, requestOptions);
+                                            //             const result = await response.json();
+                                            //             console.log(result);
+                                            //             toast('Comment deleted successfully');
+                                            //             await fetchComments();
 
-                                                }catch(err){
-                                                        console.log(err)
-                                                    }
-                                                }} />
-                                            </span>
-                                            : <span></span>
+                                            //         } catch (err) {
+                                            //             console.log(err)
+                                            //         }
+                                            //     }} />
+                                            // </span>
+                                            <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                                            : <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
                                         }
                                     </p>
 

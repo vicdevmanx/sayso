@@ -1,4 +1,4 @@
-import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight } from "lucide-react";
+import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight, ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import sayso from '../../assets/sayso assets/sayso.png'
 import clsx from 'clsx'
@@ -19,7 +19,7 @@ import { GlobalContext } from "@/components/functional/context";
 import { PostSkeleton } from "../components/postskeleton";
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
-    const isMobile = useMediaQuery('(max-width: 700px)');
+    const isMobile = useMediaQuery('(max-width: 720px)');
     const navigate = useNavigate()
     const [allComments, setAllComments] = useState([])
 
@@ -35,8 +35,6 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
             const result = await response.json();
             setAllComments(result)
-
-            console.log('comments', result)
         }
         catch (err) {
             console.log(err)
@@ -44,10 +42,10 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
     }
     const [commentInput, setCommentInput] = useState('')
     const [commentLoad, setCommentLoad] = useState(false)
-    
+
     const addComments = async () => {
         if (!commentInput) return toast('say something');
-        console.log('commentinggg.... this', commentInput)
+        if (!localStorage.getItem('authToken')) return toast('Please login to comment');
         const myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
         myHeaders.append("Content-Type", "application/json");
@@ -67,7 +65,6 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
             setCommentInput('');
             await fetchComments()
             setCommentLoad(false)
-            console.log('comment added', result)
         }
         catch (err) {
             console.log(err)
@@ -85,19 +82,18 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
             }
 
             <div className='flex flex-col gap-1'>
-                <p className='font-[poppins-bold] text-lg' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
-                {isMobile ?
-                    <div className=' flex gap-1 w-screen max-w-120 px-2'> <input
-                        className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
-                        placeholder='Say something...'
-                        name="commentInput"
-                        value={commentInput}
-                        onChange={(e) => setCommentInput(e.target.value)}
-                    /> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments} />}</div>
+                <p className='font-[poppins-bold] text-lg px-2' style={{ textAlign: isMobile ? 'center' : 'left' }}>Comments</p>
 
-                    : <></>
-                }
-                <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-92', 'overflow-scroll', 'h-128', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
+                <div className={clsx(' flex gap-1 w-screen px-2 flex-col items-end relative', isMobile ? 'max-w-120' : 'max-w-88')}> <textarea
+                    className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm pr-28 handleScroll'
+                    placeholder='Say something...'
+                    name="commentInput"
+                    value={commentInput}
+                    onChange={(e) => setCommentInput(e.target.value)}
+                /><div className="absolute bottom-2 right-4"> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-2 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-2 rounded-xl' : 'bg-[#1c1f26] px-4 py-2 rounded-xl'} onClick={addComments} >Comment</Button>}</div> </div>
+
+
+                <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-90', 'overflow-scroll', 'h-100', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
 
                     {allComments.length > 0 ? allComments.map(comment =>
                         <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
@@ -109,17 +105,18 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                                     <span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br />
                                     <span className="w-full">{comment?.content}</span> <br />
                                     {comment.user_id == localStorage.getItem('userId') ?
-                                        <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                            <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                            <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                        </span>
-                                        : <span></span>
+                                        // <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
+                                        //     <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                        //     <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
+                                        // </span>
+                                        <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                                        : <span className='text-[#ffffff90] text-xs'>{new Date(comment.createdAt).toLocaleDateString()}</span>
                                     }
                                 </p>
 
                             </div>
                         </div>
-                    ) : <Loader size={24}/>}
+                    ) : <Loader size={24} />}
 
                 </div>
 
@@ -132,7 +129,6 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
 
 export function More({ id }) {
     const navigate = useNavigate();
-    console.log('More id', id)
     return (
         <div className='flex flex-col items-center gap-4 font-[poppins-medium] p-6'>
             <p className='text-white font-[poppins-bold]'>What do you Wanna do?</p>
@@ -169,49 +165,18 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
     const [msgOpen, setMsgOpen] = useState(false)
     const navigate = useNavigate();
 
-    const [commentInput, setCommentInput] = useState('')
-    const addComments = async () => {
-        if (!commentInput) return toast('say something');
-        console.log('commentinggg.... this', commentInput)
-        const myHeaders = new Headers();
-        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
-        myHeaders.append("Content-Type", "application/json");
-
-        const requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify({ content: commentInput }),
-            redirect: 'follow'
-        };
-
+    const copyToClipboard = async (text) => {
         try {
-            const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
-            const result = await response.json();
-            toast('Comment added successfully')
-            setCommentInput('')
-            console.log('comment added', result)
-        }
-        catch (err) {
-            console.log(err)
+            await navigator.clipboard.writeText(text)
+            toast.success('Link Copied to clipboard!')
+        } catch (err) {
+            toast.error('Failed to copy')
         }
     }
 
-const copyToClipboard = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    toast.success('Link Copied to clipboard!')
-  } catch (err) {
-    toast.error('Failed to copy')
-  }
-}
-
     return (
 
-        <div onMouseMove={(e) => {
-            const mouseX = e.clientX
-            const mouseY = e.clientY
-
-        }} className={clsx('bg-[#1c1f26]', 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
+        <div className={clsx('bg-[#1c1f26]', review ? 'border-[0px]' : 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
                     <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic} loading="lazy" className='object-cover h-full' /> || <User size={18} />}</div>
@@ -221,15 +186,15 @@ const copyToClipboard = async (text) => {
                     </div>
                 </div>
                 <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
-                  {myprofile ?  <InfoDisplay
+                    {myprofile ? <InfoDisplay
                         info={More}
                         infoProps={{ id }}
                         trigger={<MoreHorizontal size={18} className="text-[#bbbbcc] cursor-pointer transition" />}
-                    />: <></>}
+                    /> : <></>}
                 </div>
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
-                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white overflow-hidden" onClick={() => navigate(`/post/${id}`)}>{title?.slice(0, 52)}{title.length >= 52 ? '...': ''}</h2>
+                <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white overflow-hidden" onClick={() => navigate(`/post/${id}`)}>{title?.slice(0, 52)}{title.length >= 52 ? '...' : ''}</h2>
                 {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
                 <div className='flex items-center gap-2 w-full overflow-scroll handleScroll'>
                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
@@ -255,7 +220,7 @@ const copyToClipboard = async (text) => {
                                     setLiked(true)
                                 }} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent ' />
 
-                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{likes}</p>
+                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{likes || 0}</p>
                         </span>
                         <span className='p-2 py-1.5 rounded-xl hover:bg-[#EF444450] active:bg-[#EF444450] transition'>
                             {!dislike ? <ThumbsDown onClick={() => setDisLiked(true)} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent' />
@@ -264,7 +229,7 @@ const copyToClipboard = async (text) => {
                         </span>
                     </div>
                     {review ? <div className='flex items-center gap-1 cursor-pointer active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl' onClick={() => setMsgOpen(!msgOpen)}>
-                        <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />   <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment}</p>
+                        <MessageCircleMore className='size-5 cursor-pointer stroke-[#bbbbcc]' />   <p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]'>{comment || 0}</p>
                     </div> :
                         <InfoDisplay
                             info={FullPageInfo}
@@ -275,7 +240,7 @@ const copyToClipboard = async (text) => {
                         />
                     }
                     <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 py-1.5 rounded-xl'>
-                        <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' onClick={() => copyToClipboard(`https://sayso-gules.vercel.app/post/${id}`)}/>
+                        <Share className='size-5 cursor-pointer stroke-[#bbbbcc]' onClick={() => copyToClipboard(`https://sayso-gules.vercel.app/post/${id}`)} />
                     </div>
                     <p className='bg-white rounded-lg p-1.5 py-1 absolute right-0 text-black text-[13px] items-center gap-1 font-[poppins-medium] readMore' onClick={() => navigate(`/post/${id}`)}> Read
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4">
@@ -283,15 +248,7 @@ const copyToClipboard = async (text) => {
                         </svg>
                     </p>
                 </div>
-                {review ?
-                    <div className=' flex gap-1'> <input
-                        className='bg-[#272b34] rounded-xl w-full py-3 px-4 outline-0 transition text-sm '
-                        placeholder='Say something...'
-                        name="commentInput"
-                        value={commentInput}
-                        onChange={(e) => setCommentInput(e.target.value)}
-                    /> <ArrowRight className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-3 rounded-xl size-11 w-14' : 'bg-[#272b34] p-3 rounded-xl size-11 w-14'} onClick={addComments} /> </div> : ''
-                }
+
             </div>
         </div>
     )
@@ -299,6 +256,7 @@ const copyToClipboard = async (text) => {
 
 const Home = () => {
     const postRef = useRef(null);
+    const heroRef = useRef(null);
 
     const scrollToPosts = () => {
         postRef.current?.scrollIntoView({
@@ -306,6 +264,26 @@ const Home = () => {
             block: "start",
         });
     };
+
+    const scrollToHero = () => {
+        heroRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    };
+
+    const [onHero, setOnHero] = useState(true);
+
+    useEffect(() => {
+        const onScroll = () => {
+            const heroY = heroRef.current?.getBoundingClientRect().top || 0;
+            setOnHero(heroY > -200); // adjust threshold
+        };
+
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
 
     const isMobile = useMediaQuery('(max-width: 460px)');
     const [AuthActive, setAuthActive] = useState(false);
@@ -553,7 +531,7 @@ const Home = () => {
         setFilterOpen(!filterOpen)
     }
 
-    
+
 
     const [SelectedTag, setSelectedTag] = useState(null)
     const [SelectedCategory, setSelectedCategory] = useState(null)
@@ -568,7 +546,6 @@ const Home = () => {
             const response = await fetch("https://sayso-seven.vercel.app/posts", requestOptions);
 
             const result = await response.json();
-            console.log(result)
             filter && setData(result.filter(post => post.tags.includes(filter) || post.category === filter || post.title.toLowerCase().includes(filter.toLowerCase())))
             !filter && setData(result)
 
@@ -587,9 +564,6 @@ const Home = () => {
     const [currentUser, setCurrentUser] = useState(
         localStorage.getItem('authToken') ? state.user : null
     );
-    console.log('stateuser:', state.user);
-    console.log('initial currentUser:', currentUser);
-
     useEffect(() => {
         fetchUser(localStorage.getItem('userId'));
     }, []);
@@ -611,10 +585,7 @@ const Home = () => {
         }
     };
 
-    console.log('userId:', localStorage.getItem('userId'));
-    console.log('current user:', currentUser);
-
-const FilterUI = (setSelectedCategory, setSelectedTag) => {
+    const FilterUI = (setSelectedCategory, setSelectedTag) => {
         return (
             <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
                 <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
@@ -642,8 +613,8 @@ const FilterUI = (setSelectedCategory, setSelectedTag) => {
                                     const filter = e.target.value;
                                     await fetchPosts(filter);
                                 }}
-                                />
-                                
+                            />
+
                         )
                     }
 
@@ -659,17 +630,24 @@ const FilterUI = (setSelectedCategory, setSelectedTag) => {
                     }</div>
             </div>
 
-            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
-                <div className='absolute bg-[#000000aa] insert-0 w-full h-full'></div>
-                <p className='text-2xl font-[poppins-bold] text-center leading-snug z-100'><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
+            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" ref={heroRef} style={{ backgroundImage: `url(${heroImg})` }}>
+                <div className='absolute bg-[#000000aa] insert-0 w-full h-full' ></div>
+                <p className={clsx(isMobile ? 'text-2xl' : 'text-3xl', '-mt-8', 'font-[poppins-bold] text-center leading-snug z-100')}><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
                 <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
                     {localStorage.getItem('authToken') ?
                         <div className='flex gap-2 items-center'>
-                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
+                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
                         </div>
-                        : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
-                    <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-10 z-100' onClick={scrollToPosts}>Explore</Button>
+                        : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
                 </div></div>
+            <Button
+                className={`${onHero ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'bg-[#272b34]'}
+                     w-16 h-16 z-100 fixed bottom-4 right-4 rounded-full flex items-center justify-center transition-all duration-300 ${onHero ? 'pulse-ring' : ''
+                    } `}
+                onClick={onHero ? scrollToPosts : scrollToHero}
+            >
+                {onHero ? <ArrowDown className='size-6' /> : <ArrowUp className='size-6' />}
+            </Button>
 
 
             <div className='flex justify-center' ref={postRef}>

@@ -108,7 +108,6 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
             setLoading(true)
             const response = await fetch(`https://sayso-seven.vercel.app/posts`, requestOptions);
             const result = await response.json();
-            console.log(result)
             toast.success('Post created successfully')
             navigate('/')
 
@@ -158,7 +157,6 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
             setLoading(true)
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
-            console.log(result)
             toast.success('Post Edited successfully')
             navigate('/')
 

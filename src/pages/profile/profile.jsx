@@ -9,7 +9,7 @@ import Loader from "@/assets/loader/loader";
 import { useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import { PostSkeleton } from "../components/postskeleton";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 
 const Profile = () => {
     useEffect(() => {
@@ -39,7 +39,6 @@ const Profile = () => {
             const result = await response.json();
             setCurrentUser(result.user); // ✅ Properly update state
             setPosts(result.posts);
-            console.log(result) // ✅ Set posts from the fetched user data
         } catch (err) {
             console.log(err);
         }
@@ -131,6 +130,7 @@ console.log(localStorage.getItem('authToken'))
 
     return (
         <div className="min-h-screen flex flex-col m-auto items-center max-w-3xl w-full p-2 px-0">
+            <Toaster position="top-center" closeButton={false} />
             {editMode ?
                 <div className="flex flex-col items-center my-2">
 
@@ -200,8 +200,8 @@ console.log(localStorage.getItem('authToken'))
             <div className="mt-4 p-4  w-full flex flex-col items-center">
                 <h3 className="text-xl font-[poppins-bold] mb-4">Recent Posts</h3>
                 <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
-                    {posts ? posts.map(element =>
-                        <Post username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true} />
+                    {posts ? posts.map((element, i) =>
+                        <Post key={i} username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true} />
                     ) :
                         Array.from({ length: 6 }).map((_, i) =>
                             <PostSkeleton key={i} />
