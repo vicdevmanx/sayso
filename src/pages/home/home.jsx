@@ -36,10 +36,10 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         try {
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}/comments`, requestOptions)
             const result = await response.json();
-            
-            if(result.length === 0) {
+
+            if (result.length === 0) {
                 setAllComments([{ content: 'No comments yet', info: 'Be the first to comment', users: { username: 'SaySo' } }])
-            }else setAllComments(result)
+            } else setAllComments(result)
         }
         catch (err) {
             console.log(err)
@@ -103,7 +103,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                     {allComments.length > 0 ? allComments.map((comment, i) =>
                         <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full' key={i}>
                             <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
-                              {!comment.info && <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
+                                {!comment.info && <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
                                     <img src={comment?.users?.profile_image_url || defaultProfile} className='object-cover h-full' loading="lazy" />
                                 </span>}
                                 <p className='leading-snug'>
@@ -115,13 +115,13 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                                         //     <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
                                         // </span>
                                         <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
-                                        :  <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
+                                        : <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
                                     }
                                 </p>
 
                             </div>
                         </div>
-                    ) : <CommentSkeleton/>}
+                    ) : <CommentSkeleton />}
 
                 </div>
 
@@ -542,7 +542,8 @@ const Home = () => {
     const [SelectedCategory, setSelectedCategory] = useState(null)
     const [searchLoading, setSearchLoading] = useState(false);
     const [postsExists, setPostsExists] = useState(true);
-    const fetchPosts = async (filter = '') => {
+
+    const fetchPosts = async (filter = '', category = '', tag = '') => {
 
         var requestOptions = {
             method: 'GET',
@@ -552,10 +553,15 @@ const Home = () => {
         try {
             const response = await fetch("https://sayso-seven.vercel.app/posts", requestOptions);
             const result = await response.json();
-            filter && setData(result.filter(post => post.tags.includes(filter) || post.category === filter || post.title.toLowerCase().includes(filter.toLowerCase())))
-            !filter && setData(result)
+            filter && setData(result.filter(post => post.tags.toLowerCase().includes(filter.toLowerCase()) || post.category.toLowerCase() === filter.toLowerCase() || post.title.toLowerCase().includes(filter.toLowerCase())))
+            category && tag && setData(result.filter(post => post.category.toLowerCase() === category && post.tags.toLowerCase().includes(tag.toLowerCase())))
+            category && setData(result.filter(post => post.category.toLowerCase() === category.toLowerCase()))
+            tag && setData(result.filter(post => post.tags.toLowerCase().includes(tag.toLowerCase())))
+
+            !filter && !category && !tag && setData(result)
             if (data.length === 0 || result.length === 0 || data === undefined || data === null) {
                 setPostsExists(false);
+               
             } else {
                 setPostsExists(true);
             }
@@ -568,7 +574,8 @@ const Home = () => {
 
     useEffect(() => {
         fetchPosts()
-    }, [])
+    }, []);
+
 
 
     const { state } = useContext(GlobalContext);
@@ -595,18 +602,59 @@ const Home = () => {
             console.log(err);
         }
     };
-
-    const FilterUI = (setSelectedCategory, setSelectedTag) => {
+    const [filterLoading, setFilterLoading] = useState(false);
+    const FilterUI = ({ setSelectedCategory, setSelectedTag, setFilterLoading, handleClose, SelectedCategory, SelectedTag }) => {
+        const [category, setCategory] = useState('');
+        const [tag, setTag] = useState('');
+        useEffect(() => {
+            setCategory(SelectedCategory || '');
+            setTag(SelectedTag || '');
+        }, [SelectedCategory, SelectedTag]);
         return (
             <div className="flex flex-col gap-4 text-white font-[poppins] p-4 w-screen max-w-md bg-[#1c1f26] rounded-xl">
-                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34] w-full" />
+                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34] w-full"
+                    name='category'
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                />
 
-                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#88a7ef] w-full" />
+                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#88a7ef] w-full"
+                    name='tag'
+                    value={tag}
+                    onChange={(e) => setTag(e.target.value)}
+                />
 
-                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec] py-6'> Filter</Button>
+                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec] py-6'
+                    onClick={() => {
+                        if (category || tag) {
+                            setSelectedCategory(category);
+                            setSelectedTag(tag);
+                            setFilterLoading(true);
+                            fetchPosts('', category, tag).then(() => {
+
+                                setFilterLoading(false)
+                                setSearchLoading(false)
+
+                            });
+                            handleClose();
+                        } else {
+                            toast('Please select a category or tag to filter');
+                            return;
+                        }
+                    }}
+                > Filter</Button>
             </div>
         )
     }
+
+    useEffect(() => {
+        const hasPosts =
+            Array.isArray(data) ? data.length > 0 :
+                typeof data === 'object' && data !== null ? Object.keys(data).length > 0 :
+                    Boolean(data);
+
+        setPostsExists(hasPosts);
+    }, [data]);
     return (
         <div>
             <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000 h-16'>
@@ -615,40 +663,26 @@ const Home = () => {
                     {
                         isFocused && (
                             <div className={`${isMobile ? 'right-2' : 'right-14'} absolute InputAni min-lg:InputAni2 max-w-xl`}>
-                            <input
-                                ref={inputRef}
-                                onBlur={() => setIsFocused(false)}
-                                type='search'
-                                placeholder='Search Posts...'
-                                className={` text-sm bg-[#262a35] rounded-xl p-3 pl-4 outline-0 w-full`}
-                                onInput={async (e) => {
-                                    const filter = e.target.value;
-                                    scrollToPosts()
-                                    setSearchLoading(true);
-                                    await fetchPosts(filter).then(() => {
-                                        setSearchLoading(false)
-                                        if (data.length === 0 || data === undefined || data === null) {
-                                            toast(`No posts for ${filter} not found`, {
-                                                position: "top-center",
-                                                autoClose: 5000,
-                                                hideProgressBar: false,
-                                                closeOnClick: true,
-                                                pauseOnHover: true,
-                                                draggable: true,
-                                                progress: undefined,
-                                            });
-                                            setPostsExists(false);
-                                        }else {
-                                            setPostsExists(true);
-                                        }
-                                    });
-                                }}
-                            />
-                            {searchLoading && (
-                                <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-                                    <Loader size={24} />
-                                </div>
-                            )}
+                                <input
+                                    ref={inputRef}
+                                    onBlur={() => setIsFocused(false)}
+                                    type='search'
+                                    placeholder='Search Posts...'
+                                    className={` text-sm bg-[#262a35] rounded-xl p-3 pl-4 outline-0 w-full`}
+                                    onInput={async (e) => {
+                                        const filter = e.target.value;
+                                        scrollToPosts()
+                                        setSearchLoading(true);
+                                        fetchPosts(filter).then(() => {
+                                            setSearchLoading(false)
+                                        });
+                                    }}
+                                />
+                                {searchLoading && (
+                                    <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+                                        <Loader size={24} />
+                                    </div>
+                                )}
                             </div>
 
                         )
@@ -674,11 +708,11 @@ const Home = () => {
                         <div className='flex gap-2 items-center'>
                             <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
                             <Button className='bg-red-400' onClick={() => {
-                                                localStorage.removeItem('authToken')
-                                                localStorage.removeItem('userId')
-                                                toast('Logging out...')
-                                                window.location.reload();
-                                            }}>Logout</Button>
+                                localStorage.removeItem('authToken')
+                                localStorage.removeItem('userId')
+                                toast('Logging out...')
+                                window.location.reload();
+                            }}>Logout</Button>
                         </div>
                         : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
                 </div></div>
@@ -699,29 +733,39 @@ const Home = () => {
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
                         <InfoDisplay
                             info={FilterUI}
-
+                            infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading }}
                             trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
 
                         />
 
-                        {/* <div className='flex gap-1 items-center overflow-hidden w-0 border-l-2 border-[#272b34] pl-1' style={{ width: filterOpen ? '135px' : '0px', transition: '.3s' }}>
-                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[13px] cursor-pointer'>Category</span>
-                            <span className='px-2 py-1 bg-[#272b34] rounded-full text-[13px] cursor-pointer'>Tags</span>
-                        </div> */}
+                        <div className='flex flex-wrap gap-1 items-center overflow-hidden border-l-2 border-[#272b34] pl-2'>
+                            {filterLoading && <Loader size={16} className='text-[#717889]' />}
+                            {SelectedCategory && <span className='px-2 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-2'>{SelectedCategory} <X className=' size-5 text-red' onClick={() => {
+                                setSelectedCategory(null)
+                                setFilterLoading(true)
+                                fetchPosts('', '', SelectedTag).then(() => setFilterLoading(false))
+                            }} /></span>}
+                            {SelectedTag && <span className='px-2 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-2'>#{SelectedTag} <X className=' size-5 text-red' onClick={() => {
+                                setSelectedTag(null)
+                                setFilterLoading(true)
+                                fetchPosts('', SelectedCategory, '').then(() => setFilterLoading(false))
+                            }
+                            } /> </span>}
+                        </div>
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ?
-                            data.map((element, i) =>
+                            postsExists ? data.map((element, i) =>
                                 <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time}
                                     date={element.created_at.slice(0, 10)} title={element.title}
                                     tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
-                            ) :
-                            postsExists ? Array.from({ length: 6 }).map((_, i) =>
-                                <PostSkeleton key={i} />
                             ) : <div className='flex flex-col items-center justify-center gap-4 w-full h-full'>
                                 <SearchSlash className='size-64 text-[#717889]' />
                                 <h1 className='text-white font-[poppins-bold] text-2xl'>No Posts Found!</h1>
-                            </div>
+                            </div> :
+                            Array.from({ length: 6 }).map((_, i) =>
+                                <PostSkeleton key={i} />
+                            )
                         }
                     </div>
 

@@ -17,23 +17,25 @@ export default function InfoDisplay({ info: InfoComponent, infoProps = {}, trigg
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  // Add `handleClose` only if InfoComponent wants to use it.
+  const injectedProps = { ...infoProps, handleClose };
+
   return (
     <>
-      {/* Trigger: wrapped in a span so you can pass any JSX (icon, button, etc.) */}
+      {/* Trigger */}
       <span onClick={handleOpen} className="inline-block cursor-pointer">
         {trigger}
       </span>
 
       {isMobile ? (
         <Drawer open={open} onOpenChange={setOpen} className='p-0 border-0'>
-          {/* Hidden trigger since we handle opening manually */}
           <DrawerTrigger asChild>
             <span className="hidden" />
           </DrawerTrigger>
-          <DrawerContent className=" border-0 px-2 bg-[#1c1f26]">
-          <div className="text-white flex flex-col items-center ">
+          <DrawerContent className="border-0 px-2 bg-[#1c1f26]">
+            <div className="text-white flex flex-col items-center">
               <div className='bg-[#444455] w-12 h-1 rounded-full mb-2 -mt-2'></div>
-              <InfoComponent {...infoProps} />
+              <InfoComponent {...injectedProps} />
             </div>
           </DrawerContent>
         </Drawer>
@@ -53,9 +55,7 @@ export default function InfoDisplay({ info: InfoComponent, infoProps = {}, trigg
               maxHeight: "90vh",
             }}
           >
-            <div className="">
-              <InfoComponent {...infoProps} />
-            </div>
+            <InfoComponent {...injectedProps} />
           </Box>
         </Modal>
       )}
