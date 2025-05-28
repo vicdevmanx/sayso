@@ -729,16 +729,17 @@ const Home = () => {
             <div className='flex justify-center' ref={postRef}>
 
                 <div className='flex flex-col p-2 gap-4 max-w-6xl'>
-                    <div className='flex items-center justify-center gap-2 mt-6 mb-2'>
+                    <div className={`flex items-center justify-center gap-2 mt-6 mb-2 ${isMobile ? 'flex-col': 'flex-row'}`}>
+                        <div className='flex gap-2 items-center'>
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
                         <InfoDisplay
                             info={FilterUI}
                             infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading, SelectedCategory, SelectedTag }}
                             trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
 
-                        />
+                        /></div>
 
-                        <div className='flex flex-wrap gap-1 items-center overflow-hidden border-l-2 border-[#272b34] pl-2'>
+                        <div className={`flex gap-1 items-center overflow-scroll handleScroll border-l-2 border-[#272b34] pl-2`}>
                             {filterLoading && <Loader size={16} className='text-[#717889]' />}
                             {SelectedCategory && <span className='px-2 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-2'>{SelectedCategory} <X className=' size-5 text-red' onClick={() => {
                                 setSelectedCategory(null)
