@@ -302,6 +302,7 @@ const Home = () => {
             inputRef.current?.focus()
         }, 0);
         setIsFocused(true)
+          scrollToPosts()
     }
 
 
@@ -553,10 +554,10 @@ const Home = () => {
         try {
             const response = await fetch("https://sayso-seven.vercel.app/posts", requestOptions);
             const result = await response.json();
-            filter && setData(result.filter(post => post.tags.toLowerCase().includes(filter.toLowerCase()) || post.category.toLowerCase() === filter.toLowerCase() || post.title.toLowerCase().includes(filter.toLowerCase())))
-            category && tag && setData(result.filter(post => post.category.toLowerCase() === category && post.tags.toLowerCase().includes(tag.toLowerCase())))
-            category && setData(result.filter(post => post.category.toLowerCase() === category.toLowerCase()))
-            tag && setData(result.filter(post => post.tags.toLowerCase().includes(tag.toLowerCase())))
+            filter && setData(result.filter(post => post.tags.toLowerCase().includes(filter.toLowerCase().trim()) || post.category.toLowerCase() === filter.toLowerCase().trim() || post.title.toLowerCase().includes(filter.toLowerCase().trim())))
+            category && tag && setData(result.filter(post => post.category.toLowerCase() === category.toLowerCase().trim() && post.tags.toLowerCase().includes(tag.toLowerCase().trim())))
+            category && setData(result.filter(post => post.category.toLowerCase() === category.toLowerCase().trim()))
+            tag && setData(result.filter(post => post.tags.toLowerCase().includes(tag.toLowerCase().trim())))
 
             !filter && !category && !tag && setData(result)
             if (data.length === 0 || result.length === 0 || data === undefined || data === null) {
@@ -609,7 +610,7 @@ const Home = () => {
         useEffect(() => {
             setCategory(SelectedCategory || '');
             setTag(SelectedTag || '');
-        }, [SelectedCategory, SelectedTag]);
+        }, []);
         return (
             <div className="flex flex-col gap-4 text-white font-[poppins] p-4 w-screen max-w-md bg-[#1c1f26] rounded-xl">
                 <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34] w-full"
@@ -671,7 +672,6 @@ const Home = () => {
                                     className={` text-sm bg-[#262a35] rounded-xl p-3 pl-4 outline-0 w-full`}
                                     onInput={async (e) => {
                                         const filter = e.target.value;
-                                        scrollToPosts()
                                         setSearchLoading(true);
                                         fetchPosts(filter).then(() => {
                                             setSearchLoading(false)
@@ -733,7 +733,7 @@ const Home = () => {
                         <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
                         <InfoDisplay
                             info={FilterUI}
-                            infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading }}
+                            infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading, SelectedCategory, SelectedTag }}
                             trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
 
                         />
