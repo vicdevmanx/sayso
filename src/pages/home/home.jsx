@@ -667,7 +667,7 @@ const Home = () => {
                                 <input
                                     ref={inputRef}
                                     onBlur={() => setIsFocused(false)}
-                                    type='search'
+                                    type='text'
                                     placeholder='Search Posts...'
                                     className={` text-sm bg-[#262a35] rounded-xl p-3 pl-4 outline-0 w-full`}
                                     onInput={async (e) => {
