@@ -619,7 +619,7 @@ const Home = () => {
                     onChange={(e) => setCategory(e.target.value)}
                 />
 
-                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#88a7ef] w-full"
+                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34] w-full"
                     name='tag'
                     value={tag}
                     onChange={(e) => setTag(e.target.value)}
@@ -759,9 +759,9 @@ const Home = () => {
                                 <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time}
                                     date={element.created_at.slice(0, 10)} title={element.title}
                                     tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
-                            ) : <div className='flex flex-col items-center justify-center gap-4 w-full h-full'>
-                                <SearchSlash className='size-64 text-[#717889]' />
-                                <h1 className='text-white font-[poppins-bold] text-2xl'>No Posts Found!</h1>
+                            ) : <div className='flex flex-col items-center justify-center gap-4 bg-[#272b34] p-6 rounded-lg w-[18rem]'>
+                        <SearchSlash className='size-8 text-[#6c5ce7]' />
+                        <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
                             </div> :
                             Array.from({ length: 6 }).map((_, i) =>
                                 <PostSkeleton key={i} />

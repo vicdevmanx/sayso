@@ -226,13 +226,13 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                     onChange={handleChange}
                     onInput={
                         (e) => {
-                            if (e.target.value.length >= 100) {
-                                e.target.value = e.target.value.slice(0, 100)
-                                toast.error('Title should not be more than 100 characters')
+                            if (e.target.value.length >= 80) {
+                                e.target.value = e.target.value.slice(0, 80)
+                                toast.error('Title should not be more than 80 characters')
                             }
                             setErr({
                                 ...err,
-                                title: `${e.target.value.length}/100`
+                                title: `${e.target.value.length}/80`
                             })
                         }
                     }
