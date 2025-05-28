@@ -44,6 +44,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
     }
     const [commentInput, setCommentInput] = useState('')
     const [commentLoad, setCommentLoad] = useState(false)
+    
     const addComments = async () => {
         if (!commentInput) return toast('say something');
         console.log('commentinggg.... this', commentInput)
@@ -118,7 +119,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
 
                             </div>
                         </div>
-                    ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium]'>No comments yet</p>}
+                    ) : <Loader size={24}/>}
 
                 </div>
 
@@ -552,21 +553,11 @@ const Home = () => {
         setFilterOpen(!filterOpen)
     }
 
-    const FilterUI = (setSelectedCategory, setSelectedTag) => {
-        return (
-            <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
-                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
-
-                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
-
-                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
-            </div>
-        )
-    }
+    
 
     const [SelectedTag, setSelectedTag] = useState(null)
     const [SelectedCategory, setSelectedCategory] = useState(null)
-    const fetchPosts = async () => {
+    const fetchPosts = async (filter = '') => {
 
         var requestOptions = {
             method: 'GET',
@@ -578,7 +569,8 @@ const Home = () => {
 
             const result = await response.json();
             console.log(result)
-            setData(result)
+            filter && setData(result.filter(post => post.tags.includes(filter) || post.category === filter || post.title.toLowerCase().includes(filter.toLowerCase())))
+            !filter && setData(result)
 
         } catch (err) {
             console.log(err)
@@ -622,7 +614,17 @@ const Home = () => {
     console.log('userId:', localStorage.getItem('userId'));
     console.log('current user:', currentUser);
 
+const FilterUI = (setSelectedCategory, setSelectedTag) => {
+        return (
+            <div className="flex flex-col gap-4 text-white font-[poppins] p-4 ">
+                <input type="text" placeholder="Filter by Category" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#272b34]" />
 
+                <input type="text" placeholder="Filter by Tag" className="p-3 py-2 rounded-md outline-0 focus:border-white transition border border-[#88a7ef]" />
+
+                <Button className='w-full bg-gradient-to-r from-[#6c5ce7] to-[#958aec]'> Filter</Button>
+            </div>
+        )
+    }
     return (
         <div>
             <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000'>
@@ -635,7 +637,13 @@ const Home = () => {
                                 onBlur={() => setIsFocused(false)}
                                 type='search'
                                 placeholder='Search Posts...'
-                                className='absolute text-xs bg-[#262a35] rounded-xl p-4 pl-4 outline-0 InputAni min-lg:InputAni2 right-2 max-w-xl' />
+                                className='absolute text-xs bg-[#262a35] rounded-xl p-4 pl-4 outline-0 InputAni min-lg:InputAni2 right-2 max-w-xl h-11'
+                                onInput={async (e) => {
+                                    const filter = e.target.value;
+                                    await fetchPosts(filter);
+                                }}
+                                />
+                                
                         )
                     }
 

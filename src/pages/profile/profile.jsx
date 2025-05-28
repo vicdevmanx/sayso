@@ -45,8 +45,8 @@ const Profile = () => {
         }
     };
     const [form, setForm] = useState({
-        username: null,
-        bio: null
+        username:  '' || currentUser?.username,
+        bio: '' || currentUser?.username
     })
 
     const handleChange = (e) => {
@@ -157,8 +157,8 @@ console.log(localStorage.getItem('authToken'))
                             <Loader size={24} />
                         </div>
                     }
-                    <input className="text-lg font-[poppins-medium] text-white border p-2 rounded-lg py-1 border-[#2c2f36]" value={form.username == null ? currentUser?.username : form.username} name='username' onChange={handleChange} placeholder="Enter username" />
-                    <textarea className="text-white text-center mt-2 text-md font-[poppins] border p-2 rounded-lg py-1 border-[#2c2f36] w-82" value={form.bio == null ? currentUser?.bio : form.bio} name='bio' onChange={handleChange} placeholder="Enter bio" />
+                    <input className="text-lg font-[poppins-medium] text-white border p-2 rounded-lg py-1 border-[#2c2f36]" value={form.username} name='username' onChange={handleChange} placeholder="Enter username" />
+                    <input className="text-white mt-2 text-md font-[poppins] border p-2 rounded-lg py-1 border-[#2c2f36] w-82" value={form.bio} name='bio' onChange={handleChange} placeholder="Enter bio" />
                 </div>
                 : <div className="flex flex-col items-center my-2">
 

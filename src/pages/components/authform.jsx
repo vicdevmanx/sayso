@@ -93,6 +93,11 @@ const Signup = ({ func }) => {
 
             const result = await response.json()
             setLoading(false);
+            if (result.error) {
+                toast.error('User already exists');
+                console.log(result.error);
+                return;
+            }
             toast.success('Signed successfully');
             updateState({ user: result.user })
             localStorage.setItem('authToken', result.token)
@@ -115,7 +120,6 @@ const Signup = ({ func }) => {
         catch (err) {
             console.log(err)
             setLoading(false);
-            toast.error('error');
         }
     }
 
