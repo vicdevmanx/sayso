@@ -226,7 +226,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white overflow-hidden" onClick={() => navigate(`/post/${id}`)}>{title?.slice(0, 52)}{title.length >= 52 ? '...' : ''}</h2>
                 {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
-                <div className='flex items-center gap-2 w-full overflow-scroll handleScroll max-w-78'>
+                <div className='flex items-center gap-2 w-full overflow-scroll handleScroll max-w-76'>
                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
                     ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
@@ -728,8 +728,8 @@ const Home = () => {
                         : <div className='bg-[#1c1f26] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{localStorage.getItem('authToken') ? <Loader size={16} /> : <User size={18} />}</div>
                     }</div>
             </div>
-
-            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" ref={heroRef} style={{ backgroundImage: `url(${heroImg})` }}>
+<div ref={heroRef} className="-mt-16"></div>
+            <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full' ></div>
                 {/* <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div>
                 <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div> */}
