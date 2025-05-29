@@ -226,7 +226,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white overflow-hidden" onClick={() => navigate(`/post/${id}`)}>{title?.slice(0, 52)}{title.length >= 52 ? '...' : ''}</h2>
                 {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
-                <div className='flex items-center gap-2 w-full overflow-scroll handleScroll max-w-80'>
+                <div className='flex items-center gap-2 w-full overflow-scroll handleScroll max-w-78'>
                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
                     ) : <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tags}</p>
