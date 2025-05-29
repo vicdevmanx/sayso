@@ -169,6 +169,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
     const [dislike, setDisLiked] = useState(false)
     const [msgOpen, setMsgOpen] = useState(false)
     const navigate = useNavigate();
+    const { state } = useContext(GlobalContext);
 
     const copyToClipboard = async (text) => {
         try {
@@ -176,6 +177,29 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             toast.success('Link Copied to clipboard!')
         } catch (err) {
             toast.error('Failed to copy')
+        }
+    }
+
+    const handleSendLike = async (id) => {
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+
+        var raw = "null";
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        try {
+            const response = await fetch(`${state.url}/posts/${id}/like`, requestOptions);
+            const result = await response.json();
+            // console.log(result);
+            setLiked(true);
+        } catch (error) {
+            console.error('Error:', error);
         }
     }
 
@@ -222,7 +246,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                             {liked && !dislike ? <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-blue-500 stroke-[#3B82F6]' onClick={() => setLiked(false)}><path d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"></path></svg>
                                 : <ThumbsUp onClick={() => {
                                     setDisLiked(false)
-                                    setLiked(true)
+                                    handleSendLike(id)
                                 }} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent ' />
 
                             }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{likes || 0}</p>
@@ -302,7 +326,7 @@ const Home = () => {
             inputRef.current?.focus()
         }, 0);
         setIsFocused(true)
-          scrollToPosts()
+        scrollToPosts()
     }
 
 
@@ -562,7 +586,7 @@ const Home = () => {
             !filter && !category && !tag && setData(result)
             if (data.length === 0 || result.length === 0 || data === undefined || data === null) {
                 setPostsExists(false);
-               
+
             } else {
                 setPostsExists(true);
             }
@@ -729,17 +753,17 @@ const Home = () => {
             <div className='flex justify-center' ref={postRef}>
 
                 <div className='flex flex-col p-2 gap-4 max-w-6xl'>
-                    <div className={`flex items-center justify-center gap-2 mt-6 mb-2 ${isMobile ? 'flex-col': 'flex-row'}`}>
+                    <div className={`flex items-center justify-center gap-2 mt-6 mb-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <div className='flex gap-2 items-center'>
-                        <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
-                        <InfoDisplay
-                            info={FilterUI}
-                            infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading, SelectedCategory, SelectedTag }}
-                            trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
+                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium]'>All Posts</Button>
+                            <InfoDisplay
+                                info={FilterUI}
+                                infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading, SelectedCategory, SelectedTag }}
+                                trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
 
-                        /></div>
+                            /></div>
 
-                        <div className={`flex gap-1 items-center overflow-scroll handleScroll border-l-2 border-[#272b34] pl-2`}>
+                        <div className={`flex gap-1 items-center overflow-scroll handleScroll ${isMobile ? 'border-0' : 'border-l-2'} border-[#272b34] pl-2`}>
                             {filterLoading && <Loader size={16} className='text-[#717889]' />}
                             {SelectedCategory && <span className='px-2 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-2'>{SelectedCategory} <X className=' size-5 text-red' onClick={() => {
                                 setSelectedCategory(null)
@@ -761,8 +785,8 @@ const Home = () => {
                                     date={element.created_at.slice(0, 10)} title={element.title}
                                     tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
                             ) : <div className='flex flex-col items-center justify-center gap-4 bg-[#272b34] p-6 rounded-lg w-[18rem]'>
-                        <SearchSlash className='size-8 text-[#6c5ce7]' />
-                        <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
+                                <SearchSlash className='size-8 text-[#6c5ce7]' />
+                                <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
                             </div> :
                             Array.from({ length: 6 }).map((_, i) =>
                                 <PostSkeleton key={i} />
