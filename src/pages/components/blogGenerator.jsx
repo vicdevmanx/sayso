@@ -19,7 +19,7 @@ const useBlogGenerator = () => {
             const myHeaders = new Headers();
             myHeaders.append("Authorization", "Bearer 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");
             myHeaders.append("Content-Type", "application/json");
-            myHeaders.append("HTTP-Referer", "http://localhost:3000");
+            myHeaders.append("HTTP-Referer", "https://sayso-gules.vercel.app");
 
             const raw = JSON.stringify({
                 "model": "google/gemma-2b-it",
