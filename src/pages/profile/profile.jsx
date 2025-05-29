@@ -212,6 +212,8 @@ const Profile = () => {
                     localStorage.removeItem('authToken')
                     localStorage.removeItem('userId')
                     toast('Logging out...')
+                    localStorage.removeItem("aiUsesDate");
+                    localStorage.removeItem("aiUsesLeft")
                     navigate('/')
                     window.location.reload();
                 }}>Logout</Button>
@@ -226,7 +228,7 @@ const Profile = () => {
                             <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
                             <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' onClick={() => navigate('/createpost')}>Create Your First Post</Button>
                         </div> : posts.map((element, i) =>
-                            <Post key={i} username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true} />
+                            <Post key={i} username={currentUser?.username} profilepic={currentUser?.profile_image_url} readtime={element?.read_time} date={element.created_at.slice(0, 10)} title={element.title} tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} myprofile={true} />
                         ) :
                         Array.from({ length: 6 }).map((_, i) =>
                             <PostSkeleton key={i} />

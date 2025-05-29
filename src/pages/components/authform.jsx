@@ -99,18 +99,19 @@ const Signup = ({ func }) => {
                 return;
             }
             toast.success('Signed successfully');
-            updateState({ user: result.user })
-            localStorage.setItem('authToken', result.token)
-            localStorage.setItem('userId', result.user.id)
-            console.log(result);
-            window.location.reload();
-
             setFormData({
                 username: '',
                 email: '',
                 password: '',
                 bio: ''
             });
+            updateState({ user: result.user })
+            localStorage.setItem('authToken', result.token)
+            localStorage.setItem('userId', result.user.id)
+            console.log(result);
+            window.location.reload();
+
+            
 
             setProfileImg(null)
             setMainPicFile(null)
@@ -132,7 +133,7 @@ const Signup = ({ func }) => {
             </div>
             <div className="min-[350px]:w-82 w-72 flex justify-center relative">
                 <div className="w-26 h-26 rounded-full bg-[#1c1f26] flex justify-center items-center overflow-hidden">
-                    {profileImg ? <img src={profileImg} /> : <Camera className="size-10" />}
+                    {profileImg ? <img src={profileImg} className='h-full object-cover'/> : <Camera className="size-10" />}
                 </div>
                 <div onClick={handleFileUpload} className="cursor-pointer w-10 h-10 rounded-full bg-[#272b34] flex justify-center items-center absolute bottom-0 right-24 min-[350px]:right-24">
                     <Plus className="size-6" />
@@ -148,9 +149,10 @@ const Signup = ({ func }) => {
             </div>
             <div className="flex flex-col gap-2 mt-2 p-2 pb-0">
                 <input
+                disabled={loading}
                     type="text"
                     placeholder="Enter Username"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white focus:border-white transition outline-0"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white focus:border-white transition outline-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     required
                     name='username'
                     value={formData.username}
@@ -170,9 +172,10 @@ const Signup = ({ func }) => {
                     }
                 />{err.username && <p className='text-red-500 text-sm'>{err.username}</p>}
                 <input
+                disabled={loading}
                     type="email"
                     placeholder="Email"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     name='email'
                     value={formData.email}
                     onChange={handleChange}
@@ -192,9 +195,10 @@ const Signup = ({ func }) => {
                     }}
                 />{err.email && <p className='text-red-500 text-sm'>{err.email}</p>}
                 <textarea
+                disabled={loading}
                     type="text"
                     placeholder="Say something about yourself"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0 h-25"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0 h-25 disabled:opacity-50 disabled:cursor-not-allowed"
                     name='bio'
                     value={formData.bio}
                     onChange={handleChange}
@@ -212,9 +216,10 @@ const Signup = ({ func }) => {
                 />{err.bio && <p className='text-red-500 text-sm'>{err.bio}</p>}
                 <div className='relative'>
                 <input
+                disabled={loading}
                     type={seePassword ? "text" : "password"}
                     placeholder="Password"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0 w-full"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white  focus:border-white transition outline-0 w-full disabled:opacity-50 disabled:cursor-not-allowed"
                     name='password'
                     value={formData.password}
                     onChange={handleChange}
@@ -240,7 +245,7 @@ const Signup = ({ func }) => {
 
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2 '>
-                <button className="cursor-pointer py-4 bg-gradient-to-r  from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2" onClick={handleSignup} disabled={loading}>
+                <button className="cursor-pointer py-4 bg-gradient-to-r  from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleSignup} disabled={loading}>
                     {loading ?
                         <> <Loader size='16px' /> <p>Signing up...</p></>
                         :
@@ -298,15 +303,16 @@ const Login = ({ func }) => {
             
             setLoading(false);
             toast.success('Successfully logged in');
+               setFormData({
+                email: '',
+                password: ''
+            });
             localStorage.setItem('authToken', result.token)
             localStorage.setItem('userId', result.user.id)
             updateState({ user: result.user })
             console.log(result.token);
             window.location.reload();
-            setFormData({
-                email: '',
-                password: ''
-            });
+         
 
         }
         catch (err) {
@@ -323,18 +329,20 @@ const Login = ({ func }) => {
             </div>
             <div className="flex flex-col gap-2 mt-2 p-2 pb-0 min-[350px]:w-82 w-72 flex justify-center">
                 <input
+                 disabled={loading}
                     type="email"
                     placeholder="Email"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white disabled:cursor-not-allowed"
                     name='email'
                     value={formData.email}
                     onChange={handleChange}
                 />
                 <div className='relative'>
                 <input
+                 disabled={loading}
                     type={seePassword ? "text" : "password"}
                     placeholder="Password"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white w-full"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white w-full disabled:cursor-not-allowed disabled:opacity-50 "
                     name='password'
                     value={formData.password}
                     onChange={handleChange}
@@ -343,7 +351,7 @@ const Login = ({ func }) => {
                 </div>
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2'>
-                <button className="py-4 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2" onClick={handleLogin} disabled={loading}>
+                <button className="py-4 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2 disabled:cursor-not-allowed" onClick={handleLogin} disabled={loading}>
                     {loading ?
                         <> <Loader size='16px' /> <p>Logging in...</p></>
                         :

@@ -567,7 +567,7 @@ const Home = () => {
     const [SelectedCategory, setSelectedCategory] = useState(null)
     const [searchLoading, setSearchLoading] = useState(false);
     const [postsExists, setPostsExists] = useState(true);
-
+    const [GeneralLoading, setGeneralLoading] = useState(false);
     const fetchPosts = async (filter = '', category = '', tag = '') => {
 
         var requestOptions = {
@@ -576,6 +576,7 @@ const Home = () => {
         };
 
         try {
+            setGeneralLoading(true);
             const response = await fetch("https://sayso-seven.vercel.app/posts", requestOptions);
             const result = await response.json();
             filter && setData(result.filter(post => post.tags.toLowerCase().includes(filter.toLowerCase().trim()) || post.category.toLowerCase() === filter.toLowerCase().trim() || post.title.toLowerCase().includes(filter.toLowerCase().trim())))
@@ -584,16 +585,10 @@ const Home = () => {
             tag && setData(result.filter(post => post.tags.toLowerCase().includes(tag.toLowerCase().trim())))
 
             !filter && !category && !tag && setData(result)
-            if (data.length === 0 || result.length === 0 || data === undefined || data === null) {
-                setPostsExists(false);
-
-            } else {
-                setPostsExists(true);
-            }
-
+            setGeneralLoading(false);
         } catch (err) {
             console.log(err)
-
+            setGeneralLoading(false);
         }
     }
 
@@ -677,8 +672,8 @@ const Home = () => {
             Array.isArray(data) ? data.length > 0 :
                 typeof data === 'object' && data !== null ? Object.keys(data).length > 0 :
                     Boolean(data);
-
         setPostsExists(hasPosts);
+
     }, [data]);
     return (
         <div>
@@ -734,6 +729,8 @@ const Home = () => {
                             <Button className='bg-red-400' onClick={() => {
                                 localStorage.removeItem('authToken')
                                 localStorage.removeItem('userId')
+                                localStorage.removeItem("aiUsesDate");
+                                localStorage.removeItem("aiUsesLeft")
                                 toast('Logging out...')
                                 window.location.reload();
                             }}>Logout</Button>
@@ -759,18 +756,18 @@ const Home = () => {
                             <InfoDisplay
                                 info={FilterUI}
                                 infoProps={{ setSelectedCategory, setSelectedTag, setFilterLoading, SelectedCategory, SelectedTag }}
-                                trigger={<Button className='bg-[#1c1f26] font-[poppins-medium]' onClick={() => filter()}>Filter <Filter /> </Button>}
+                                trigger={<Button className='bg-[#1c1f26] font-[poppins-medium] w-24 flex gap-2 items-center justify-center' onClick={() => filter()}>Filter {filterLoading ? <Loader size={16} /> : <Filter size={16} />} </Button>}
 
                             /></div>
 
                         <div className={`flex gap-1 items-center overflow-scroll handleScroll ${isMobile ? 'border-0' : 'border-l-2'} border-[#272b34] pl-2`}>
-                            {filterLoading && <Loader size={16} className='text-[#717889]' />}
-                            {SelectedCategory && <span className='px-2 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-2'>{SelectedCategory} <X className=' size-5 text-red' onClick={() => {
+
+                            {SelectedCategory && <span className='px-2 pl-3 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-1'>{SelectedCategory} <X className=' size-5 text-red' onClick={() => {
                                 setSelectedCategory(null)
                                 setFilterLoading(true)
                                 fetchPosts('', '', SelectedTag).then(() => setFilterLoading(false))
                             }} /></span>}
-                            {SelectedTag && <span className='px-2 py-2 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-2'>#{SelectedTag} <X className=' size-5 text-red' onClick={() => {
+                            {SelectedTag && <span className='px-2 py-2 pl-3 bg-[#272b34] rounded-full text-[13px] cursor-pointer flex items-center gap-1'>#{SelectedTag} <X className=' size-5 text-red' onClick={() => {
                                 setSelectedTag(null)
                                 setFilterLoading(true)
                                 fetchPosts('', SelectedCategory, '').then(() => setFilterLoading(false))
@@ -780,7 +777,7 @@ const Home = () => {
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ?
-                            postsExists ? data.map((element, i) =>
+                            postsExists && !GeneralLoading ? data.map((element, i) =>
                                 <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time}
                                     date={element.created_at.slice(0, 10)} title={element.title}
                                     tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />

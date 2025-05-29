@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Edit, Plus, Trash2, X } from 'lucide-react';
+import { Camera, Edit, Plus, Trash2, WandSparkles, X } from 'lucide-react';
 import { User, MoreHorizontal, ThumbsUp, ThumbsDown, MessageCircleMore, Share, ArrowRight, Pencil, Trash, ChevronLeft } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import clsx from 'clsx'
 import { toast, Toaster } from 'sonner'
 import Loader from '@/assets/loader/loader';
+import useBlogGenerator from '../components/blogGenerator';
+import { useAiUsage } from '../components/aiUsage';
 
 
 const CreatePost = ({ title, content, tags, category, image, id, update = false }) => {
@@ -21,7 +23,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
     const [PostImg, setPostImg] = useState(image || null);
     const navigate = useNavigate();
     const [allTags, setAllTags] = useState(update ? tags : [])
-    const [loading, setLoading] = useState(false);
+    const [myloading, setmyLoading] = useState(false);
 
     const handleFileUpload = () => {
         PostImgRef.current?.click();
@@ -31,14 +33,14 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
     const MAX_IMAGE_SIZE_MB = 3; // Maximum image size in MB
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
-        
+
         if (file) {
-        const sizeInMB = file.size / (1024 * 1024);
-        if (sizeInMB > MAX_IMAGE_SIZE_MB) {
-            toast.error(`Image too large. Max size is ${MAX_IMAGE_SIZE_MB}MB`);
-            return;
+            const sizeInMB = file.size / (1024 * 1024);
+            if (sizeInMB > MAX_IMAGE_SIZE_MB) {
+                toast.error(`Image too large. Max size is ${MAX_IMAGE_SIZE_MB}MB`);
+                return;
+            }
         }
-    }
 
 
         setImageFile(file)
@@ -116,14 +118,14 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
         };
 
         try {
-            setLoading(true)
+            setmyLoading(true)
             const response = await fetch(`https://sayso-seven.vercel.app/posts`, requestOptions);
             const result = await response.json();
             toast.success('Post created successfully')
             navigate('/')
 
-            if (response.ok) setLoading(false)
-            else setLoading(false)
+            if (response.ok) setmyLoading(false)
+            else setmyLoading(false)
             //clear fields if successfully
             setPostImg(null)
             setImageFile(null)
@@ -136,7 +138,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
             })
             /////////
         } catch (err) {
-            setLoading(false)
+            setmyLoading(false)
             console.log(err)
         }
     }
@@ -165,14 +167,14 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
         };
 
         try {
-            setLoading(true)
+            setmyLoading(true)
             const response = await fetch(`https://sayso-seven.vercel.app/posts/${id}`, requestOptions);
             const result = await response.json();
             toast.success('Post Edited successfully')
             navigate('/')
 
-            if (response.ok) setLoading(false)
-            else setLoading(false)
+            if (response.ok) setmyLoading(false)
+            else setmyLoading(false)
             //clear fields if successfully
             setPostImg(null)
             setImageFile(null)
@@ -185,7 +187,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
             })
             /////////
         } catch (err) {
-            setLoading(false)
+            setmyLoading(false)
             console.log(err)
         }
     }
@@ -194,6 +196,9 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
     // <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
     //     <p className="text-white text-[13px]">{username || 'anonymous'}</p>
     // </div>
+
+    const { loading, generatedContent, generateContent } = useBlogGenerator()
+    const { usesLeft, disabled, consumeUse } = useAiUsage();
 
     return (
         <div className="min-h-screen flex flex-col m-auto px-2 pb-20 w-full max-w-4xl gap-4">
@@ -208,7 +213,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                         title ? handleEditSubmit() : handlePostSubmit()
 
                     }}>
-                    {loading ?
+                    {myloading ?
                         <> <Loader size='16px' /> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
                         :
                         <p>{title ? 'Update Post' : 'Post'} </p>
@@ -340,6 +345,47 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
             </p>
 
             {err.content && <p className='text-white text-xs'>{err.content}</p>}
+            <button
+                onClick={async () => {
+                    if (disabled) {
+                        toast.error('You have no AI uses left today');
+                        return;
+                    }
+
+                    if (!formData.title?.trim()) {
+                        toast.error('Please enter a title before generating content');
+                        return;
+                    }
+
+                    if (generatedContent) {
+                        toast.error('Content already generated');
+                        return;
+                    }
+
+                    try {
+                        consumeUse(); // All checks passed
+
+                        const content = await generateContent(formData.title); // 👈 capture result
+
+                        if (content) {
+                            setFormData({
+                                ...formData,
+                                content,
+                            });
+                        } else {
+                            toast.error('Failed to generate content');
+                        }
+                    } catch (err) {
+                        toast.error('Something went wrong during generation');
+                    }
+                }}
+
+                disabled={loading}
+                className={`bg-gradient-to-r from-[#6c5ce7] to-[#958aec] text-white py-4 px-4 rounded-lg flex justify-center gap-2 items-center font-[poppins-medium] hover:opacity-90 transition-all  disabled:cursor-not-allowed ${loading ? 'animate-pulse animate-glow' : ''}`}
+                title={`You have ${usesLeft} left today to Generate Blog Content`}
+            >
+                <WandSparkles /> {loading ? "AI Generating Content..." : `Let AI Generate Content. (${usesLeft} Left)`} {loading && <Loader size='18px' />}
+            </button>
             <div className="bg-[#1c1f26] shadow-lg rounded-lg w-full min-h-32 h-auto">
                 <input
                     type="file"
@@ -350,26 +396,26 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                 />
                 <div className="w-full h-auto min-h-36 rounded-md flex justify-center items-center overflow-hidden relative" onClick={!PostImg && handleFileUpload}>
                     {PostImg && <div className='absolute top-2 right-2 p-1 cursor-pointer flex gap-2 items-center'>
-                        <span className='w-10 h-10 bg-[#272b34] rounded-full flex items-center justify-center' onClick={handleFileUpload}><Pencil className='size-6'/></span>
-                         <span className='w-10 h-10 bg-[#272b34] rounded-full flex items-center justify-center' onClick={() => {
+                        <span className='w-10 h-10 bg-[#272b34] rounded-full flex items-center justify-center' onClick={handleFileUpload}><Pencil className='size-6' /></span>
+                        <span className='w-10 h-10 bg-[#272b34] rounded-full flex items-center justify-center' onClick={() => {
                             setPostImg(null);
                             setImageFile(null);
-                         }}><Trash2 className='size-6 stroke-red-500'/></span>
+                        }}><Trash2 className='size-6 stroke-red-500' /></span>
                     </div>}
                     {PostImg ? <img src={PostImg} />
-                    : <div className='flex flex-col gap-1 items-center'><Camera className="size-10" /> <p>Add Image</p><p>Max image size is {MAX_IMAGE_SIZE_MB}MB</p></div>}
+                        : <div className='flex flex-col gap-1 items-center'><Camera className="size-10" /> <p>Add Image</p><p>Max image size is {MAX_IMAGE_SIZE_MB}MB</p></div>}
                 </div>
             </div>
 
             <button
                 type='submit'
-                disable={loading}
-                className='p-4 text-white rounded-md w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
+                disable={myloading}
+                className='p-4 text-white rounded-lg w-full mt-2 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex justify-center gap-2 items-center'
                 onClick={() => {
                     title ? handleEditSubmit() : handlePostSubmit()
 
                 }}>
-                {loading ?
+                {myloading ?
                     <> <Loader size='16px' /> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
                     :
                     <p>{title ? 'Update Post' : 'Post'} </p>
