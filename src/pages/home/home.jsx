@@ -1,4 +1,4 @@
-import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight, ArrowDown, ArrowUp, SearchSlash } from "lucide-react";
+import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, Link, Filter, X, Pencil, Trash, Share, Link2, Share2, Send, ArrowBigUp, ArrowRight, ArrowDown, ArrowUp, SearchSlash, PlusCircle, Plus, LogOut, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import sayso from '../../assets/sayso assets/sayso.png'
 import clsx from 'clsx'
@@ -19,6 +19,7 @@ import { GlobalContext } from "@/components/functional/context";
 import { PostSkeleton } from "../components/postskeleton";
 import defaultProfile from '../../assets/default.webp'
 import CommentSkeleton from "../components/commentSkeleton";
+import logo from '../../assets/sayso assets/saysologo.png' 
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 720px)');
@@ -81,7 +82,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
         fetchComments()
     }, [])
     return (
-        <div className={clsx('flex', isMobile ? 'p-0' : 'p-4', 'gap-2', 'text-white')}>
+        <div className={clsx('flex', isMobile ? 'p-0' : 'p-2', 'gap-2', 'text-white')}>
             {isMobile ? <></> :
                 <Post username={username} profilepic={profilepic} readtime={readtime} date={date} title={title} tags={tags} postImg={postImg} likes={likes} comment={comment} review={true} id={id} content={content.slice(0, 120) + '...'} />
             }
@@ -235,7 +236,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             </div>
             <div className='p-2 pt-0 pb-0'>
                 <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden')} onClick={() => navigate(`/post/${id}`)}>
-                    <img loading="lazy" src={postImg || imageOne} className='object-fit w-full h-auto' />
+                    <img loading="lazy" src={postImg || imageOne} className='object-cover h-full w-full' />
                 </div>
             </div>
             <div className='px-2 select-none'>
@@ -730,22 +731,26 @@ const Home = () => {
 
             <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" ref={heroRef} style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full' ></div>
-                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100')}><br /> Blog Freely, Speak Boldly. <br /> Say More With Sayso</p>
+                {/* <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div>
+                <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div> */}
+                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100 flex flex-col items-center')}><br />Blog Freely, Speak Boldly. <br /> <span className='flex gap-2 items-center justify-center'> Say It. AI’s <WandSparkles className={`${isMobile ? 'size-6' : 'size-8'} -mb-2`}/> Got You </span></p>
                 <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
                     {localStorage.getItem('authToken') ?
                         <div className='flex gap-2 items-center'>
-                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => navigate('/createpost')}>Create Post</Button>
-                            <Button className='bg-red-400' onClick={() => {
+                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 py-5 z-100 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => navigate('/createpost')}><Plus className='size-4.5'/> Create Post</Button>
+                            <Button className='bg-red-400 py-5 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => {
                                 localStorage.removeItem('authToken')
                                 localStorage.removeItem('userId')
                                 localStorage.removeItem("aiUsesDate");
                                 localStorage.removeItem("aiUsesLeft")
                                 toast('Logging out...')
                                 window.location.reload();
-                            }}>Logout</Button>
+                            }}> Logout<LogOut className='size-4.5'/></Button>
                         </div>
                         : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
-                </div></div>
+                </div>
+
+            </div>
             <Button
                 className={`${onHero ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' : 'bg-[#272b34]'}
                      w-14 h-14 z-20 fixed bottom-8 right-4 rounded-full flex items-center justify-center transition-all duration-300 ${onHero ? 'pulse-ring' : ''
@@ -756,8 +761,8 @@ const Home = () => {
             </Button>
 
 
-            <div className='flex justify-center' ref={postRef}>
-
+            <div className='flex justify-center'>
+                <div ref={postRef} className='-mt-10'></div>
                 <div className='flex flex-col p-2 gap-4 max-w-6xl'>
                     <div className={`flex items-center justify-center gap-2 mt-6 mb-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <div className='flex gap-2 items-center'>
@@ -815,11 +820,14 @@ const Home = () => {
                         }
 
                     </div>
-                    <div className='flex justify-center'>
+                    <div className='flex justify-center -mt-8'>
                         <Pagination
                             count={Math.ceil((data && data.length) / postsPerPage)}
                             page={currentPage}
-                            onChange={(e, value) => setCurrentPage(value)}
+                            onChange={(e, value) => {
+                                setCurrentPage(value)
+                                scrollToPosts();
+                            }}
                             variant="outlined"
                             shape="rounded"
                             sx={{
@@ -827,8 +835,13 @@ const Home = () => {
                                     color: "#bbbbcc",
                                     borderColor: "#444857",
                                     backgroundColor: "#1e212a",
-                                    margin: "0 4px",
+                                    margin: "0 2px",
+                                    fontSize: "1rem",            // Bigger font
+                                    padding: "16px 16px",        // Bigger padding
+                                    minWidth: "40px",
+                                    minHeight: "40px",         // Wider buttons
                                     fontFamily: "Poppins, sans-serif",
+
                                 },
                                 "& .Mui-selected": {
                                     backgroundColor: "#6c5ce7 !important",
@@ -837,6 +850,7 @@ const Home = () => {
                                 },
                                 "& .MuiPaginationItem-icon": {
                                     color: "#bbbbcc",
+                                    fontSize: "1.2rem",
                                 },
                             }}
                         />

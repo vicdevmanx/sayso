@@ -216,7 +216,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                     {myloading ?
                         <> <Loader size='16px' /> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
                         :
-                        <p>{title ? 'Update Post' : 'Post'} </p>
+                        <p>{title ? 'Update Post' : 'Create Post'} </p>
                     }
 
                 </Button>
@@ -418,7 +418,7 @@ const CreatePost = ({ title, content, tags, category, image, id, update = false 
                 {myloading ?
                     <> <Loader size='16px' /> <p>{title ? 'Updating Post...' : 'Creating Post...'}</p></>
                     :
-                    <p>{title ? 'Update Post' : 'Post'} </p>
+                    <p>{title ? 'Update Post' : 'Create Post'} </p>
                 }
             </button>
 

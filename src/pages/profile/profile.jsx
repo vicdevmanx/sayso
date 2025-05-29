@@ -1,4 +1,4 @@
-import { Pencil, Plus, SearchSlash, User } from "lucide-react";
+import { Edit, LogOut, Pencil, Plus, SearchSlash, User } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Post } from "../home/home";
 import clsx from 'clsx';
@@ -126,6 +126,7 @@ const Profile = () => {
         catch (error) {
             console.log(error);
             toast.error('Failed to update profile. Please try again later.');
+             setUpdating(false)
             setEditMode(false); // Exit edit mode on error
         }
     }
@@ -193,7 +194,7 @@ const Profile = () => {
                 </div>}
 
             <div className="flex gap-2 justify-center items-center">
-                <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec]' onClick={() => {
+                <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] font-[poppins-medium] flex items-center justify-center gap-1' onClick={() => {
                     if (editMode) {
                         // If in edit mode, save changes
                         handleUpdateProfile();
@@ -207,8 +208,8 @@ const Profile = () => {
                         setEditMode(!editMode)
                     }
                 }
-                }>{updating ? <Loader size={18} /> : <></>}{editMode ? 'Save Profile' : 'Edit Profile'}</Button>
-                <Button className='bg-red-400' onClick={() => {
+                }>{updating ? <Loader size={16} /> : <Edit className="w-6"/>}{editMode ? 'Save Profile' : 'Edit Profile'}</Button>
+                <Button className='bg-red-400 flex justify-center items-center gap-1 font-[poppins-bold]' onClick={() => {
                     localStorage.removeItem('authToken')
                     localStorage.removeItem('userId')
                     toast('Logging out...')
@@ -216,7 +217,7 @@ const Profile = () => {
                     localStorage.removeItem("aiUsesLeft")
                     navigate('/')
                     window.location.reload();
-                }}>Logout</Button>
+                }}>Logout <LogOut className='w-5'/></Button>
             </div>
 
             <div className="mt-4 p-4  w-full flex flex-col items-center">

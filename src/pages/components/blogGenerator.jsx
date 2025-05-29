@@ -18,7 +18,6 @@ const useBlogGenerator = () => {
 
             const myHeaders = new Headers();
             myHeaders.append("Authorization", `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`)
-            console.log(import.meta.env.VITE_OPENROUTER_API_KEY)
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("HTTP-Referer", "https://sayso-gules.vercel.app");
 

@@ -129,7 +129,6 @@ const Signup = ({ func }) => {
         <div>
             <div className="flex flex-col gap-2 p-2 text-center">
                 <h1 className="text-2xl font-[poppins-bold] text-white">Create an account</h1>
-                <p className="text-sm text-[#717889]">Join the community and start sharing your thoughts.</p>
             </div>
             <div className="min-[350px]:w-82 w-72 flex justify-center relative">
                 <div className="w-26 h-26 rounded-full bg-[#1c1f26] flex justify-center items-center overflow-hidden">
@@ -252,7 +251,7 @@ const Signup = ({ func }) => {
                         <p> Signup </p>
                     }
                 </button>
-                <p className="text-sm text-[#717889] text-center flex items-center justify-center mt-4">Already have an account? &nbsp;<div className='text-blue-500 cursor-pointer underline' onClick={func}> Login</div></p>
+                <p className="text-md text-white font-[poppins-medium] text-center flex items-center justify-center mt-3">Already have an account? &nbsp;<div className='text-[#958aec] cursor-pointer underline' onClick={func}> Login</div></p>
             </div></div>
     )
 };
@@ -325,14 +324,14 @@ const Login = ({ func }) => {
     return (
         <div>
             <div className="flex flex-col gap-2 p-2 text-center">
-                <h1 className="text-2xl font-[poppins-semibold] text-white">Welcome Back!</h1>
+                <h1 className="text-2xl font-[poppins-bold] text-white">Welcome Back!</h1>
             </div>
             <div className="flex flex-col gap-2 mt-2 p-2 pb-0 min-[350px]:w-82 w-72 flex justify-center">
                 <input
                  disabled={loading}
                     type="email"
                     placeholder="Email"
-                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white disabled:cursor-not-allowed"
+                    className="bg-[#272b34] border-2 border-[#272b34] rounded-lg p-3 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50 "
                     name='email'
                     value={formData.email}
                     onChange={handleChange}
@@ -351,15 +350,15 @@ const Login = ({ func }) => {
                 </div>
             </div>
             <div className='p-2 pt-0 flex flex-col gap-2'>
-                <button className="py-4 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2 disabled:cursor-not-allowed" onClick={handleLogin} disabled={loading}>
+                <button className="py-4 bg-gradient-to-r from-[#6c5ce7] to-[#958aec] w-full rounded-lg p-3 mt-4 text-sm font-[poppins-bold] flex justify-center items-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 " onClick={handleLogin} disabled={loading}>
                     {loading ?
                         <> <Loader size='16px' /> <p>Logging in...</p></>
                         :
                         <p> Login </p>
                     }
                 </button>
-                <p className="text-sm text-[#717889] text-center">Dont have an account?</p>
-                <button className="py-4 border-2 w-full rounded-lg p-3 mt-4 text-sm font-[poppins-semibold]" onClick={func}>Sign up</button>
+                <p className="text-md text-white text-center font-[poppins-medium]">Dont have an account?</p>
+                <button className="py-4 border-2 w-full rounded-lg p-3 mt-2 text-sm font-[poppins-medium]" onClick={func}>Sign up</button>
             </div>
 
         </div>
