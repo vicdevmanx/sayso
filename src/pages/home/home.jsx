@@ -2,7 +2,7 @@ import { MoreHorizontal, Search, ThumbsUp, User, ThumbsDown, MessageCircleMore, 
 import { Button } from "@/components/ui/button";
 import sayso from '../../assets/sayso assets/sayso.png'
 import clsx from 'clsx'
-import { useMediaQuery } from "@mui/material";
+import { Pagination, useMediaQuery } from "@mui/material";
 import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
 import Drawer from '@mui/material/Drawer';
@@ -675,6 +675,15 @@ const Home = () => {
         setPostsExists(hasPosts);
 
     }, [data]);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const postsPerPage = 6;
+
+    // Calculate paginated posts
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = data && data.slice(indexOfFirstPost, indexOfLastPost);
+
     return (
         <div>
             <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000 h-16'>
@@ -777,18 +786,61 @@ const Home = () => {
                     </div>
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ?
-                            postsExists && !GeneralLoading ? data.map((element, i) =>
-                                <Post key={i} username={element.users.username} profilepic={element?.users?.profile_image_url} readtime={element?.read_time}
-                                    date={element.created_at.slice(0, 10)} title={element.title}
-                                    tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags} postImg={element.image_url} likes={element.like_count} comment={element.comment_count} review={false} id={element.id} content={element.content} />
-                            ) : <div className='flex flex-col items-center justify-center gap-4 bg-[#272b34] p-6 rounded-lg w-[18rem]'>
-                                <SearchSlash className='size-8 text-[#6c5ce7]' />
-                                <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
-                            </div> :
-                            Array.from({ length: 6 }).map((_, i) =>
-                                <PostSkeleton key={i} />
+                            postsExists && !GeneralLoading ? (
+                                currentPosts.map((element, i) => (
+                                    <Post
+                                        key={i}
+                                        username={element.users.username}
+                                        profilepic={element?.users?.profile_image_url}
+                                        readtime={element?.read_time}
+                                        date={element.created_at.slice(0, 10)}
+                                        title={element.title}
+                                        tags={typeof element.tags === 'string' && element.tags.includes(',') ? element.tags.split(',') : element.tags}
+                                        postImg={element.image_url}
+                                        likes={element.like_count}
+                                        comment={element.comment_count}
+                                        review={false}
+                                        id={element.id}
+                                        content={element.content}
+                                    />
+                                ))
+                            ) : (
+                                <div className='flex flex-col items-center justify-center gap-4 bg-[#272b34] p-6 rounded-lg w-[18rem]'>
+                                    <SearchSlash className='size-8 text-[#6c5ce7]' />
+                                    <h2 className='text-lg font-[poppins-medium] text-white'>No Posts Found</h2>
+                                </div>
+                            ) : (
+                                Array.from({ length: 6 }).map((_, i) => <PostSkeleton key={i} />)
                             )
                         }
+
+                    </div>
+                    <div className='flex justify-center'>
+                        <Pagination
+                            count={Math.ceil((data && data.length) / postsPerPage)}
+                            page={currentPage}
+                            onChange={(e, value) => setCurrentPage(value)}
+                            variant="outlined"
+                            shape="rounded"
+                            sx={{
+                                "& .MuiPaginationItem-root": {
+                                    color: "#bbbbcc",
+                                    borderColor: "#444857",
+                                    backgroundColor: "#1e212a",
+                                    margin: "0 4px",
+                                    fontFamily: "Poppins, sans-serif",
+                                },
+                                "& .Mui-selected": {
+                                    backgroundColor: "#6c5ce7 !important",
+                                    color: "#fff !important",
+                                    borderColor: "#6c5ce7",
+                                },
+                                "& .MuiPaginationItem-icon": {
+                                    color: "#bbbbcc",
+                                },
+                            }}
+                        />
+
                     </div>
 
                 </div>
