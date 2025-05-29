@@ -17,7 +17,7 @@ const useBlogGenerator = () => {
             setLoading(true);
 
             const myHeaders = new Headers();
-            myHeaders.append("Authorization", "Bearer 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");
+            myHeaders.append("Authorization", "Bearer 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");
             myHeaders.append("Content-Type", "application/json");
             myHeaders.append("HTTP-Referer", "https://sayso-gules.vercel.app");
 
