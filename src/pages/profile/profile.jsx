@@ -189,7 +189,7 @@ const Profile = () => {
                         </div>
                     }
                     <h2 className="text-lg font-[poppins-medium] text-white">{currentUser?.username || <Skeleton width={100} height={15} baseColor="#2c2f36" highlightColor="#3a3e48" />}</h2>
-                    <p className="text-white text-center mt-1 text-md font-[poppins]">{currentUser?.bio || <Skeleton width={200} height={15} baseColor="#2c2f36" highlightColor="#3a3e48" />}
+                    <p className="text-white text-center mt-1 text-md font-[poppins] px-2">{currentUser?.bio || <Skeleton width={200} height={15} baseColor="#2c2f36" highlightColor="#3a3e48" />}
                     </p>
                 </div>}
 
@@ -209,7 +209,7 @@ const Profile = () => {
                     }
                 }
                 }>{updating ? <Loader size={16} /> : <Edit className="w-6"/>}{editMode ? 'Save Profile' : 'Edit Profile'}</Button>
-                <Button className='bg-red-400 flex justify-center items-center gap-1 font-[poppins-bold]' onClick={() => {
+                <Button className='bg-red-400 flex justify-center items-center gap-1 font-[poppins-medium]' onClick={() => {
                     localStorage.removeItem('authToken')
                     localStorage.removeItem('userId')
                     toast('Logging out...')

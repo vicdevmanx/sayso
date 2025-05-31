@@ -6,7 +6,7 @@ import { Pagination, useMediaQuery } from "@mui/material";
 import ModalTrigger from "../components/authtrigger";
 import AuthForm from "../components/authform";
 import Drawer from '@mui/material/Drawer';
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, use } from 'react'
 import { Toaster, toast } from 'sonner'
 import imageOne from '../../assets/logo2.jpg'
 import './home.css'
@@ -225,7 +225,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             </div>
             <div className='p-3 pb-0 pt-0 flex flex-col gap-2'>
                 <h2 className="font-[poppins-bold] text-lg leading-snug h-13 text-white overflow-hidden" onClick={() => navigate(`/post/${id}`)}>{title?.slice(0, 52)}{title.length >= 52 ? '...' : ''}</h2>
-                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white">{content || "couldn't load"}</h2> : ''}
+                {review ? <h2 className="font-[poppins-medium] text-sm leading-snug h-15 text-white flex gap-1 hover:underline cursor-pointer" onClick={() => navigate(`/post/${id}`)}>{content || "couldn't load"} See More</h2> : ''}
                 <div className='flex items-center gap-2 w-full overflow-scroll handleScroll max-w-76'>
                     {tags ? typeof tags !== 'string' ? tags?.map(tag =>
                         <p className='text-[10.5px] font-[poppins-medium] border-2 border-[#272b34] text-[#717889] px-1.5 py-1 rounded-lg cursor-pointer select-none cursor-pointer'>#{tag}</p>
@@ -684,10 +684,10 @@ const Home = () => {
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
     const currentPosts = data && data.slice(indexOfFirstPost, indexOfLastPost);
-
+    const [searchVal, setSearchVal] = useState('');
     return (
         <div>
-            <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] sticky top-0 bg-[#0e1116] z-1000 h-16'>
+            <div className='flex justify-between items-center p-3 py-2 border-b border-[#1c1f26] backdrop-blur-sm sticky top-0 bg-[#0e1116cc] z-1000 h-15'>
                 <h1 className='font-[poppins-bold] text-xl select-none'><img src={sayso} alt='saysologo' className='w-24' /></h1>
                 <div className='flex gap-2 items-center'>
                     {
@@ -704,6 +704,7 @@ const Home = () => {
                                         setSearchLoading(true);
                                         fetchPosts(filter).then(() => {
                                             setSearchLoading(false)
+                                            setSearchVal(filter)
                                         });
                                     }}
                                 />
@@ -728,16 +729,18 @@ const Home = () => {
                         : <div className='bg-[#1c1f26] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{localStorage.getItem('authToken') ? <Loader size={16} /> : <User size={18} />}</div>
                     }</div>
             </div>
-<div ref={heroRef} className="-mt-16"></div>
+<div ref={heroRef} className="-mt-16 absolute"></div>
             <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full' ></div>
                 {/* <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div>
                 <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div> */}
-                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100 flex flex-col items-center')}><br />Blog Freely, Speak Boldly. <br /> <span className='flex gap-2 items-center justify-center'> Say It. AI’s <WandSparkles className={`${isMobile ? 'size-6' : 'size-8'} -mb-2`}/> Got You </span></p>
+                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100 flex flex-col items-center')}><br />Blog Freely, Speak Boldly. <br /> <span className='flex gap-2 items-center justify-center'> Say It. AI’s <WandSparkles className={`${isMobile ? 'size-6' : 'size-8'} -mb-1`}/> Got You </span></p>
                 <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
                     {localStorage.getItem('authToken') ?
                         <div className='flex gap-2 items-center'>
-                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 py-5 z-100 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => navigate('/createpost')}><Plus className='size-4.5'/> Create Post</Button>
+                            <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 py-5 z-100 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => navigate('/createpost')}>
+                            <Plus className='size-4.5'/>
+                             Create Post</Button>
                             <Button className='bg-red-400 py-5 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => {
                                 localStorage.removeItem('authToken')
                                 localStorage.removeItem('userId')
@@ -789,6 +792,7 @@ const Home = () => {
                             } /> </span>}
                         </div>
                     </div>
+                    {searchVal && <p className="text-center font-[poppins-bold] text-lg">Search Result for "{searchVal}"</p>}
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
                         {data ?
                             postsExists && !GeneralLoading ? (
@@ -881,7 +885,7 @@ const Home = () => {
             </footer>
 
             <Drawer
-                anchor="bottom"
+                anchor={isMobile ? "bottom" : "right"}
                 open={AuthActive && !currentUser}
                 onClose={() => setAuthActive(false)}
                 onOpen={() => setAuthActive(true)}
@@ -889,15 +893,17 @@ const Home = () => {
                 PaperProps={{
                     sx: {
                         backgroundColor: '#1a1b20',
-                        borderTopLeftRadius: '2rem',
-                        borderTopRightRadius: '2rem',
+                        borderTopLeftRadius: '1rem',
+                        borderTopRightRadius: '1rem',
                     },
                 }}
             >
-                <div className="p-1.5 px-3 h-[90vh] max-wd-lg text-white bg-[#1a1b20] flex flex-col gap-4 items-center">
+                <div className="p-1.5 px-3 max-wd-lg text-white bg-[#1a1b20] flex flex-col gap-4 items-center">
                     <X className='absolute right-4 top-4 cursor-pointer' onClick={() => setAuthActive(false)} />
                     {/* <div className='w-full flex gap-2 items-center'> */}
+                    <div className="py-2">
                     <AuthForm />
+                    </div>
                 </div>
             </Drawer>
 

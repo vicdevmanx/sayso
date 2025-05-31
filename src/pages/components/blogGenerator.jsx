@@ -4,7 +4,7 @@ import { toast } from "sonner";
 const useBlogGenerator = () => {
     const [loading, setLoading] = useState(false);
     const [generatedContent, setGeneratedContent] = useState("");
-    //   const [token, setToken] = useState("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");
+    //const [token, setToken] = useState("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");
     //import.meta.env.VITE_OPENROUTER_API_KEY
     
     const generateContent = async (title) => {
