@@ -96,7 +96,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                     name="commentInput"
                     value={commentInput}
                     onChange={(e) => setCommentInput(e.target.value)}
-                /><div className="absolute bottom-2 right-4"> {commentLoad ? <div className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] p-2 rounded-xl size-11 w-14 flex items-center justify-center'><Loader size={16} /> </div> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-2 rounded-xl' : 'bg-[#1c1f26] px-4 py-2 rounded-xl'} onClick={addComments} >Comment</Button>}</div> </div>
+                /><div className="absolute bottom-2 right-4"> {commentLoad ? <Button className={'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-2 py-1 rounded-xl flex items-center justify-center gap-1.5 text-sm'}><Loader size={12}/> Sending...</Button> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-1 rounded-xl text-sm' : 'bg-[#1c1f26] px-4 py-1 text-sm rounded-xl'} onClick={addComments} >Comment</Button>}</div> </div>
 
 
                 <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-90', 'overflow-scroll', 'h-100', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
