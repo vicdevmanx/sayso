@@ -16,6 +16,7 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
+import CommentSkeleton from "../components/commentSkeleton";
 
 const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, likes, comment }) => {
     useEffect(() => {
@@ -115,6 +116,8 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
         fetchComments()
     }, [])
 
+    const [trashLoading, setTrashLoading] = useState(false)
+
     return (
         <>{data ?
             <div className='bg-[#0e1116] font-[poppins] text-[#f5f5f5] w-full min-h-screen h-full relative'>
@@ -123,7 +126,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                     <div className='flex justify-between w-full items-center'>
                         <div className='flex flex-col gap-2'>
                             <div className='flex items-center gap-2'>
-                                <ChevronLeft onClick={() => navigate(-1)} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' />
+                                <ChevronLeft onClick={() => navigate('/')} className='size-10 -ml-2 rounded-full transition p-2 hover:bg-[#272b34] active:bg-[#272b34]' />
                                 <p className='text-white text-xl font-[poppins-bold]'>Post</p>
                             </div>
                             <div className='flex gap-2 items-center'>
@@ -206,7 +209,7 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
                             name="commentInput"
                             value={commentInput}
                             onChange={(e) => setCommentInput(e.target.value)}
-                        /><div className="absolute bottom-2 right-2"> {commentLoad ? <Button className={'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-2 py-1 rounded-xl flex items-center justify-center gap-1.5 text-sm'}><Loader size={12}/> Sending...</Button> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-1 text-sm rounded-xl text-xs' : 'bg-[#272b34] px-4 py-1 rounded-xl text-sm'} onClick={addComments} >Comment</Button>}</div> </div>
+                        /><div className="absolute bottom-2 right-2"> {commentLoad ? <Button className={'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-2 py-1 rounded-xl flex items-center justify-center gap-1.5 text-sm'}><Loader size={12} /> Sending...</Button> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-1 text-sm rounded-xl' : 'bg-[#272b34] px-4 py-1 rounded-xl text-sm'} onClick={addComments} >Comment</Button>}</div> </div>
 
 
 
@@ -216,49 +219,61 @@ const Fullblog = ({ readtime, date, title, tags = ['nice', 'good'], postImg, lik
 
                             {allComments.length > 0 ? allComments.map(comment =>
                                 <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
-                                    <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
+                                    <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full relative'>
                                         {!comment.info && <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
                                             <img src={comment?.users?.profile_image_url || defaultProfile} className='object-cover h-full' loading="lazy" />
                                         </span>}
-                                        <p className='leading-snug'>
-                                            {!comment.info && <><span className='font-[poppins-medium] w-full text-sm'>{comment?.users?.username}</span><br /></>}
+
+                                        <p className='leading-snug max-w-176'>
+                                            {!comment.info && <div className='flex items-center gap-2 justify-start'>
+                                                <div className='flex gap-1.5 items-center'>
+                                                    <span className='font-[poppins-bold] w-full text-sm'>{comment?.users?.username}</span>
+                                                    <span className="circle"></span>
+                                                    <span className='text-[#ffffff90] text-xs'> {new Date(comment.created_at).toLocaleDateString()}</span>
+                                                </div><br /></div>}
                                             <span className="w-full">{comment?.content}</span> <br />
                                             {comment.user_id == localStorage.getItem('userId') ?
-                                                // <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                                //     <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                                //     <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' onClick={async () => {
-                                                //         try {
-                                                //             var myHeaders = new Headers();
-                                                //             myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+                                                <span className='flex items-center text-[#ffffff90] gap-1 cursor-pointer relative my-2'>
+                                                    <div className="active:bg-[#272b34] hover:bg-[#272b34] p-1 rounded-full">
+                                                        <Pencil className='size-4.5' />
+                                                    </div>
+                                                    { trashLoading ? 
+                                                        <Loader size={15}/>
+                                                        :<div className="active:bg-[#272b34] hover:bg-[#272b34] p-1 rounded-full">
+                                                       
+                                                        <Trash className='size-4.5' onClick={async () => {
+                                                            try {
+                                                                var myHeaders = new Headers();
+                                                                myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+
+                                                                var requestOptions = {
+                                                                    method: 'DELETE',
+                                                                    headers: myHeaders,
+                                                                    redirect: 'follow'
+                                                                }
+                                                                setTrashLoading(true)
+                                                                const response = await fetch(`https://sayso-seven.vercel.app/comments/${comment.id}`, requestOptions);
+                                                                const result = await response.json();
+                                                                console.log(result);
+                                                                toast('Comment deleted successfully');
+                                                                setTrashLoading(false)
+                                                                await fetchComments();
 
 
-                                                //             var raw = "null";
+                                                            } catch (err) {
+                                                                console.log(err)
+                                                            }
+                                                        }} /></div>}
+                                                </span>
 
-                                                //             var requestOptions = {
-                                                //                 method: 'DELETE',
-                                                //                 headers: myHeaders,
-                                                //                 body: raw,
-                                                //                 redirect: 'follow'
-                                                //             }
-                                                //             const response = await fetch(`https://sayso-seven.vercel.app/posts/comments/${comment.id}`, requestOptions);
-                                                //             const result = await response.json();
-                                                //             console.log(result);
-                                                //             toast('Comment deleted successfully');
-                                                //             await fetchComments();
 
-                                                //         } catch (err) {
-                                                //             console.log(err)
-                                                //         }
-                                                //     }} />
-                                                // </span>
-                                                <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
-                                                : <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
+                                                : <span>{comment?.info || ''}</span>
                                             }
                                         </p>
 
                                     </div>
                                 </div>
-                            ) : <p className='text-[#bbbbcc] text-sm font-[poppins-medium] flex w-full justify-center'><Loader size={24} /></p>}
+                            ) : <CommentSkeleton/>}
 
 
                         </div>

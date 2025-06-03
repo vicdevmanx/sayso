@@ -19,7 +19,7 @@ import { GlobalContext } from "@/components/functional/context";
 import { PostSkeleton } from "../components/postskeleton";
 import defaultProfile from '../../assets/default.webp'
 import CommentSkeleton from "../components/commentSkeleton";
-import logo from '../../assets/sayso assets/saysologo.png' 
+import logo from '../../assets/sayso assets/saysologo.png'
 
 function FullPageInfo({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, id, content }) {
     const isMobile = useMediaQuery('(max-width: 720px)');
@@ -81,6 +81,7 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
     useEffect(() => {
         fetchComments()
     }, [])
+    const [trashLoading, setTrashLoading] = useState(false)
     return (
         <div className={clsx('flex', isMobile ? 'p-0' : 'p-2', 'gap-2', 'text-white')}>
             {isMobile ? <></> :
@@ -96,27 +97,62 @@ function FullPageInfo({ username, profilepic, readtime, date, title, tags, postI
                     name="commentInput"
                     value={commentInput}
                     onChange={(e) => setCommentInput(e.target.value)}
-                /><div className="absolute bottom-2 right-4"> {commentLoad ? <Button className={'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-2 py-1 rounded-xl flex items-center justify-center gap-1.5 text-sm'}><Loader size={12}/> Sending...</Button> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-1 rounded-xl text-sm' : 'bg-[#1c1f26] px-4 py-1 text-sm rounded-xl'} onClick={addComments} >Comment</Button>}</div> </div>
+                /><div className="absolute bottom-2 right-4"> {commentLoad ? <Button className={'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-2 py-1 rounded-xl flex items-center justify-center gap-1.5 text-sm'}><Loader size={12} /> Sending...</Button> : <Button className={commentInput ? 'bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-4 py-1 rounded-xl text-sm' : 'bg-[#1c1f26] px-4 py-1 text-sm rounded-xl'} onClick={addComments} >Comment</Button>}</div> </div>
 
 
                 <div className={clsx('rounded-xl', isMobile ? 'w-full' : 'w-90', 'overflow-scroll', 'h-100', 'flex', 'flex-col', 'gap-2', 'handleScroll', 'pb-12', 'p-2')}>
 
-                    {allComments.length > 0 ? allComments.map((comment, i) =>
-                        <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full' key={i}>
-                            <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full'>
+                    {allComments.length > 0 ? allComments.map(comment =>
+                        <div className='flex flex-col gap-2 font-[poppins] text-[13px] w-full'>
+                            <div className='border-2 border-[#272b34] rounded-lg p-2 flex gap-2 w-full relative'>
                                 {!comment.info && <span className='w-8 h-8 min-w-8 rounded-full bg-[#272b34] overflow-hidden flex items-center'>
                                     <img src={comment?.users?.profile_image_url || defaultProfile} className='object-cover h-full' loading="lazy" />
                                 </span>}
-                                <p className='leading-snug'>
-                                    {!comment.info && <><span className='font-[poppins-medium] w-full text-xs'>{comment?.users?.username}</span><br /></>}
-                                    <span className="w-full text-sm">{comment?.content}</span> <br />
+
+                                <p className='leading-snug max-w-176'>
+                                    {!comment.info && <div className='flex items-center gap-2 justify-start'>
+                                        <div className='flex gap-1.5 items-center'>
+                                            <span className='font-[poppins-bold] w-full text-sm'>{comment?.users?.username}</span>
+                                            <span className="circle"></span>
+                                            <span className='text-[#ffffff90] text-xs'> {new Date(comment.created_at).toLocaleDateString()}</span>
+                                        </div><br /></div>}
+                                    <span className="w-full">{comment?.content}</span> <br />
                                     {comment.user_id == localStorage.getItem('userId') ?
-                                        // <span className='flex items-center text-[#ffffff90] gap-2 cursor-pointer'>
-                                        //     <Pencil className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                        //     <Trash className='size-7 active:bg-[#272b34] hover:bg-[#272b34] p-1.5 rounded-full' />
-                                        // </span>
-                                        <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
-                                        : <span className='text-[#ffffff90] text-xs'>{comment?.info || new Date(comment.created_at).toLocaleDateString()}</span>
+                                        <span className='flex items-center text-[#ffffff90] gap-1 cursor-pointer relative my-2'>
+                                            <div className="active:bg-[#272b34] hover:bg-[#272b34] p-1 rounded-full">
+                                                <Pencil className='size-4.5' />
+                                            </div>
+                                            {trashLoading ?
+                                                <Loader size={15} />
+                                                : <div className="active:bg-[#272b34] hover:bg-[#272b34] p-1 rounded-full">
+
+                                                    <Trash className='size-4.5' onClick={async () => {
+                                                        try {
+                                                            var myHeaders = new Headers();
+                                                            myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
+
+                                                            var requestOptions = {
+                                                                method: 'DELETE',
+                                                                headers: myHeaders,
+                                                                redirect: 'follow'
+                                                            }
+                                                            setTrashLoading(true)
+                                                            const response = await fetch(`https://sayso-seven.vercel.app/comments/${comment.id}`, requestOptions);
+                                                            const result = await response.json();
+                                                            console.log(result);
+                                                            toast('Comment deleted successfully');
+                                                            setTrashLoading(false)
+                                                            await fetchComments();
+
+
+                                                        } catch (err) {
+                                                            console.log(err)
+                                                        }
+                                                    }} /></div>}
+                                        </span>
+
+
+                                        : <span>{comment?.info || ''}</span>
                                     }
                                 </p>
 
@@ -164,9 +200,9 @@ export function More({ id }) {
 
 }
 
-export const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content, myprofile = false }) => {
+export const Post = ({ username, profilepic, readtime, date, title, tags, postImg, likes, comment, review, id, content, myprofile = false, category, allLikes = [] }) => {
     const isMobile = useMediaQuery('(max-width: 460px)');
-    const [liked, setLiked] = useState(false)
+    const [liked, setLiked] = useState(localStorage.getItem('userId') && allLikes.find(id => localStorage.getItem('userId') == id))
     const [dislike, setDisLiked] = useState(false)
     const [msgOpen, setMsgOpen] = useState(false)
     const navigate = useNavigate();
@@ -180,7 +216,7 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             toast.error('Failed to copy')
         }
     }
-
+    const [updatedLikeCount, setUpdatedLikeCount] = useState(likes || 0)
     const handleSendLike = async (id) => {
         var myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${localStorage.getItem('authToken')}`);
@@ -193,26 +229,39 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
             body: raw,
             redirect: 'follow'
         };
+        liked ? setLiked(false) :
+            setLiked(true);
+
+             liked ? toast.success('post unliked!',  {duration: 1000}) :
+            toast.success('post liked!', {duration: 1000});
+
+        liked ? setUpdatedLikeCount(updatedLikeCount - 1) :
+            setUpdatedLikeCount(updatedLikeCount + 1)
 
         try {
             const response = await fetch(`${state.url}/posts/${id}/like`, requestOptions);
             const result = await response.json();
             // console.log(result);
-            setLiked(true);
+            liked ? setLiked(false) :
+                setLiked(true);
+            setUpdatedLikeCount(result.likeCount)
+            console.log(result.likeCount)
+            // toast(result.message)
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
+
     return (
 
-        <div className={clsx('bg-[#1c1f26]', review ? 'border-[0px]' : 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
+        <div className={clsx('bg-[#1c1f26] ', review ? 'border-[0px]' : 'border-[1.5px]', 'border-[#272b34]', 'hover:border-[#444455]', 'hover:bg-[#1f2429]', 'cursor-pointer', 'transition', 'rounded-2xl', 'flex', 'flex-col justify-between', 'gap-2.5', 'pb-2.5', 'parent', isMobile ? 'w-full' : 'w-78', review ? 'w-92' : '')} style={{}}>
             <div className='p-3 pb-0 flex justify-between'>
                 <div className='flex gap-2 items-center'>
                     <div className='bg-[#0e1116] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26] overflow-hidden'>{<img src={profilepic || defaultProfile} loading="lazy" className='object-cover h-full' /> || <User size={18} />}</div>
                     <div className=" text-[#bbbbcc] font-[poppins-medium] flex flex-col -gap-1.5">
                         <p className="text-white text-[13px]">{username}</p>
-                        <p className='flex items-center gap-1.5 text-xs'>{date}<span className='bg-[#bbbbcc] w-1 h-1 rounded-full'></span> {readtime} read </p>
+                        <p className='flex items-center gap-1.5 text-xs'>{date}<span className='circle'></span> {readtime} read </p>
                     </div>
                 </div>
                 <div className='flex cursor-pointer items-center gap-1 active:bg-[#272b34] hover:bg-[#272b34] p-2 rounded-xl'>
@@ -235,22 +284,23 @@ export const Post = ({ username, profilepic, readtime, date, title, tags, postIm
                 </div>
             </div>
             <div className='p-2 pt-0 pb-0'>
-                <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden')} onClick={() => navigate(`/post/${id}`)}>
+                <div className={clsx('rounded-lg', 'w-full', isMobile ? 'h-46' : 'h-36', review ? 'h-40' : '', 'bg-[#272b34]', 'overflow-hidden relative')} onClick={() => navigate(`/post/${id}`)}>
                     <img loading="lazy" src={postImg || imageOne} className='object-cover h-full w-full' />
+                    <div className='absolute right-1 bottom-1 rounded-lg bg-[#1c1f26] font-[poppins-medium] flex items-center justify-center py-1 px-2 text-xs'>{category}</div>
+
                 </div>
             </div>
             <div className='px-2 select-none'>
                 <div className='w-full b-0 h-full flex relative items-center gap-4'>
                     <div className='bg-[#272b34] rounded-xl flex gap-1 items-center cursor-pointer'>
 
-                        <span className='flex gap-2 p-2 py-1.5 items-start rounded-xl hover:bg-[#3B82F650] active:bg-[#3B82F650] transition' onClick={() => { setDisLiked(false); setLiked(!liked); }}>
-                            {liked && !dislike ? <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-blue-500 stroke-[#3B82F6]' onClick={() => setLiked(false)}><path d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"></path></svg>
+                        <span className='flex gap-2 p-2 py-1.5 items-start rounded-xl hover:bg-[#3B82F650] active:bg-[#3B82F650] transition' onClick={() => { setDisLiked(false); handleSendLike(id) }}>
+                            {liked && !dislike ? <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" className='size-5 cursor-pointer fill-blue-500 stroke-[#3B82F6]'><path d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57c.02-.1.03-.21.03-.32c0-.41-.17-.79-.44-1.06L14.17 1L7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73zM1 21h4V9H1z"></path></svg>
                                 : <ThumbsUp onClick={() => {
-                                    setDisLiked(false)
-                                    handleSendLike(id)
+
                                 }} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent ' />
 
-                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{likes || 0}</p>
+                            }<p className='text-[#bbbbcc] font-[poppins-medium] text-[15px]' style={{ color: liked && !dislike ? '#3B82F6' : '#bbbbcc' }}>{updatedLikeCount}</p>
                         </span>
                         <span className='p-2 py-1.5 rounded-xl hover:bg-[#EF444450] active:bg-[#EF444450] transition'>
                             {!dislike ? <ThumbsDown onClick={() => setDisLiked(true)} className='size-5 cursor-pointer stroke-[#bbbbcc] stroke-2 fill-transparent' />
@@ -675,6 +725,7 @@ const Home = () => {
                     Boolean(data);
         setPostsExists(hasPosts);
 
+
     }, [data]);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -702,9 +753,10 @@ const Home = () => {
                                     onInput={async (e) => {
                                         const filter = e.target.value;
                                         setSearchLoading(true);
+                                        setSearchVal(filter)
                                         fetchPosts(filter).then(() => {
                                             setSearchLoading(false)
-                                            setSearchVal(filter)
+
                                         });
                                     }}
                                 />
@@ -726,21 +778,21 @@ const Home = () => {
                         )
                     }
                     {currentUser ? <div className='w-9 h-9 rounded-full cursor-pointer overflow-hidden flex items-center' onClick={() => navigate('/profile')}><img className='aspect-auto object-cover h-full' src={currentUser.profile_image_url || defaultProfile} /></div>
-                        : <div className='bg-[#1c1f26] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}>{localStorage.getItem('authToken') ? <Loader size={16} /> : <User size={18} />}</div>
+                        : <> {localStorage.getItem('authToken') ? <Loader size={16} onClick={() => navigate('/profile')} /> : <div className='bg-[#1c1f26] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer transition hover:bg-[#1c1f26]' onClick={() => setAuthActive(true)}> <User size={18} /></div>}</>
                     }</div>
             </div>
-<div ref={heroRef} className="-mt-16 absolute"></div>
+            <div ref={heroRef} className="-mt-16 absolute"></div>
             <div className='w-full h-[100vh] bg-cover bg-center flex items-center flex-col gap-4 justify-center relative' loading="lazy" style={{ backgroundImage: `url(${heroImg})` }}>
                 <div className='absolute bg-[#000000aa] insert-0 w-full h-full' ></div>
                 {/* <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div>
                 <div className='bg-transparent w-14 h-14 z-20 absolute top-28 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center transition-all duration-300 pulse-ring'></div> */}
-                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100 flex flex-col items-center')}><br />Blog Freely, Speak Boldly. <br /> <span className='flex gap-2 items-center justify-center'> Say It. AI’s <WandSparkles className={`${isMobile ? 'size-6' : 'size-8'} -mb-1`}/> Got You </span></p>
+                <p className={clsx(isMobile ? 'text-2xl' : 'text-4xl', '-mt-36', 'font-[poppins-bold] text-center leading-snug z-100 flex flex-col items-center')}><br />Blog Freely, Speak Boldly. <br /> <span className='flex gap-2 items-center justify-center'> Say It. AI’s <WandSparkles className={`${isMobile ? 'size-6' : 'size-8'} -mb-1`} /> Got You </span></p>
                 <div className='flex flex-wrap gap-2 items-center justify-center z-100'>
                     {localStorage.getItem('authToken') ?
                         <div className='flex gap-2 items-center'>
                             <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 py-5 z-100 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => navigate('/createpost')}>
-                            <Plus className='size-4.5'/>
-                             Create Post</Button>
+                                <Plus className='size-4.5' />
+                                Create Post</Button>
                             <Button className='bg-red-400 py-5 flex items-center justify-center gap-1 text-white font-[poppins-medium]' onClick={() => {
                                 localStorage.removeItem('authToken')
                                 localStorage.removeItem('userId')
@@ -748,7 +800,7 @@ const Home = () => {
                                 localStorage.removeItem("aiUsesLeft")
                                 toast('Logging out...')
                                 window.location.reload();
-                            }}> Logout<LogOut className='size-4.5'/></Button>
+                            }}> Logout<LogOut className='size-4.5' /></Button>
                         </div>
                         : <Button className='bg-gradient-to-r from-[#6c5ce7] to-[#958aec] px-8 z-100' onClick={() => setAuthActive(true)}>Get Started</Button>}
                 </div>
@@ -794,8 +846,8 @@ const Home = () => {
                     </div>
                     {searchVal && <p className="text-center font-[poppins-bold] text-lg">Search Result for "{searchVal}"</p>}
                     <div className={clsx('flex', 'flex-wrap', 'gap-6', 'justify-center', 'pb-18')}>
-                        {data ?
-                            postsExists && !GeneralLoading ? (
+                        {!GeneralLoading && data ?
+                            postsExists ? (
                                 currentPosts.map((element, i) => (
                                     <Post
                                         key={i}
@@ -811,6 +863,8 @@ const Home = () => {
                                         review={false}
                                         id={element.id}
                                         content={element.content}
+                                        category={element.category}
+                                        allLikes={element.liked_user_ids}
                                     />
                                 ))
                             ) : (
@@ -902,7 +956,7 @@ const Home = () => {
                     <X className='absolute right-4 top-4 cursor-pointer' onClick={() => setAuthActive(false)} />
                     {/* <div className='w-full flex gap-2 items-center'> */}
                     <div className="py-2">
-                    <AuthForm />
+                        <AuthForm />
                     </div>
                 </div>
             </Drawer>

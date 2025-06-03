@@ -26,6 +26,12 @@ button {
     user-select: none;
 }
 
+@layer utilities{
+  .circle{
+    @apply bg-[#bbbbcc] min-w-1 min-h-1 rounded-full
+  }
+}
+
 
 .handleScroll {
   overflow: auto; /* auto shows scrollbars only when needed */
